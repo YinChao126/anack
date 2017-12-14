@@ -5,7 +5,9 @@
   http://hq.sinajs.cn/list=sz000651（每天更新）
   choice(需要付费)
   http://sc.hkexnews.hk/TuniS/www.hkexnews.hk/sdw/search/mutualmarket_c.aspx?t=sh （含历史数据）
-
+  
+  http://money.finance.sina.com.cn/corp/go.php/vFD_CashFlow/stockid/000651/ctrl/2017/displaytype/4.phtml (爬取历史的报表数据)
+  
 2.指标的实时监控，有预警信息后推送手机
 
 3.经过历史指标筛选出值得投资的长期股票及适合买入时机（具体算法再商议），历史数据的存储放在数据库或者树莓派上完成。
