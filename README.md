@@ -1,37 +1,34 @@
-## Welcome to GitHub Pages
+##基于PYTHON和树莓派的盈亏分析平台设计
+1.通过Python爬取网页获取实时金融指标数据
+  http://hq.sinajs.cn/list=sz000651（每天更新）
+  choice(需要付费)
+  http://sc.hkexnews.hk/TuniS/www.hkexnews.hk/sdw/search/mutualmarket_c.aspx?t=sh （含历史数据）
 
-You can use the [editor on GitHub](https://github.com/YinChao126/anack/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+2.指标的实时监控，有预警信息后推送手机
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+3.经过历史指标筛选出值得投资的长期股票及适合买入时机（具体算法再商议），历史数据的存储放在数据库或者树莓派上完成。
+  同时建模获取短期投资股票时机，短信提示手机
 
-### Markdown
+4.训练一个模拟操盘手，按每周/每月进行操作，最后按照盈亏指标来验证训练模型好坏
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+##理念
 
-# Header 1
-## Header 2
-### Header 3
+把炒股的经验做成算法，利用软件来实现。同时利用软件来发掘新的机会（机器学习）。
+其次可以发布推荐信息。设置自己的持仓后，一方面根据算法向用户发布买卖信号。另一方面算法
+在内部自己计算操作盈亏（用户可以无视买卖信号），最终可以通过比对二者差异来确定算法的好坏
 
-- Bulleted
-- List
+开发阶段可以设置多种算法同时运行，针对某一个具体指标。可以通过对比来确定使用哪种策略更有效
+直接利用已经发生了的数据进行海量机器学习。
 
-1. Numbered
-2. List
+可以实时模拟投资，看最终的投资结果
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
+##架构设计
+整体框架，需要实现的功能规划好
+功能：
+1. 能够实时监控数据变化
+2. 能够根据指定的算法进行相关的输出
+3. 能够根据算法进行模拟操盘并可以自己分析收益
+4. 能够自主学习，用以验证经验的有效性
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/YinChao126/anack/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
