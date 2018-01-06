@@ -1,12 +1,14 @@
 # 作者：尹超
-# 更新日期：2017-12-11
-# 版本号：V0.2
+# 更新日期：2018-1-6
+# 版本号：V0.3
 # 描述：本程序用于宇通客车产销快报数据的分析
 # 内容：系统初始化、数据读入、数据处理、绘图、统计分析
 # 备注：
 # 1. 务必保持工程下有连续的xlsx文件，并确保文件名有效
 # 2. 确保year/lastmonth和文件一致，否则会出现错误
 # 3. 暂时只能靠手工将pdf文件转成xlsx文件，以后可以考虑做成全自动的
+
+# 修改记录：2018-1-6.修复了产销比计算错误的bug
 #--------------------------------------------------------------------
 # initialize
 import pandas as pd
@@ -141,10 +143,13 @@ class YTKC_Buy_Seller:
         #1.今年和往年相比的增量
         print('统计汇总报告，截止'+str(self.year)+'年'+str(self.month)+'月。。。')
         print('-----------------------------------------------')
-        print('1:销量与往年相比')
-        IncRate = DiffYearTotal.iloc[9,:].pct_change() * -100
+        print('1:产销同比')
+        IncRate = DiffYearTotal.iloc[self.month-1,:].pct_change() * -100
         a = IncRate.round(2)  #保留两位小数
-        print('销量同比增长：'+str(a[1])+'%')   
+        print('产量同比增长：'+str(a[1])+'%') 
+        IncRate = (Stat.iloc[self.month-1,6] - Stat.iloc[self.month-1,7])/Stat.iloc[self.month-1,7]*100
+        a = ("%.2f" % IncRate)  #保留两位小数
+        print('销量同比增长：'+ a +'%')  
         print('-----------------------------------------------')
         #2.产销比是否健康？
         print('2.产销结构统计')
@@ -180,8 +185,13 @@ class YTKC_Buy_Seller:
 #   yt = YTKC_Buy_Seller(2017,11)   //确保path在./anack/Release下
 #   yt = YTKC_Buy_Seller(2017,11，your_path)
 # 2.直接run即可
-   
-yt= YTKC_Buy_Seller(2017,11)
+
+year = 2017
+lastmonth = 12
+filepath = 'E:/Investment/DataCenter/股票/个股历史信息/宇通客车/其他未分类/产销快报/'   
+#yt= YTKC_Buy_Seller(year,lastmonth)  #使用默认地址
+yt= YTKC_Buy_Seller(year,lastmonth,filepath)  #使用给定地址
+
 yt.run()      
 
 
