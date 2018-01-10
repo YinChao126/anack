@@ -1,4 +1,4 @@
-crawl_anjuke_v1.311.py 说明
+ crawl_anjuke_v1.311.py 说明
 
 
 本脚本实现爬取安居客二手房信息。可实现将爬取下来的信息存储到本地和导入mysql数据库。
