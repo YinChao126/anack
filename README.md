@@ -1,4 +1,3 @@
-=======
 # welcome anack
 
 ## anack是什么？
