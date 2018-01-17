@@ -344,7 +344,7 @@ class crawling_finance:
 
 
 
-path = 'D:/document/crawling/'
+path = 'C:/Users/54206/Desktop/Anack/anack/DATA/'
 cbfx = crawling_finance(path,'300104')
 cbfx.crawling_update()
     

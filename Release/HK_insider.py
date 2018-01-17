@@ -207,3 +207,4 @@ path = '../ExampleData/'
 gldq = HK_insider(path,'목제든포',0)
 gldq.HK_update(5)
 gldq.HK_plot()
+print ('hello')
