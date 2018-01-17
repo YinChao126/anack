@@ -516,7 +516,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8"""
         connect = create_engine("mysql+pymysql://"+self.users+":"+self.passwords+"@"+self.hosts+":3306/"+self.databases+"?charset=utf8")
         df.to_sql(name=table,con=connect,if_exists='append',index=False,index_label=False)
         StockCode = df.iloc[:,-1].head(1).tolist()[0]
-        print("Finished insert data into " + StockCode + '\t' +  table)
+        print("Finished insert %s data into mysql %s table." % (StockCode,table))
         
     
     def crawling_update(self):
