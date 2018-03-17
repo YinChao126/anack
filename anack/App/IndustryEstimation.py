@@ -15,13 +15,13 @@ import tushare as ts
 hosts="localhost"
 databases="anack_sql"
 users="yinchao"
-passwords="yc5315558"
+passwords="123456"
   
 dbconn=pymysql.connect(
   host="localhost",
   database="anack_sql",
   user="yinchao",
-  password="yc5315558",
+  password="123456",
   port=3306,
   charset='utf8'
  )
@@ -201,12 +201,30 @@ def IndustryEstimation(dbconn,industry_name, year):
     return result_df
 #IndustryEstimation(dbconn,'家电行业')
 #print(GetIndustryName('福耀玻璃')) 
-CreateTable()
-IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)  
-IndustryEstimation(dbconn,GetIndustryName('格力电器'),2017)   
-IndustryEstimation(dbconn,GetIndustryName('福耀玻璃'),2017)   
-IndustryEstimation(dbconn,GetIndustryName('隆基股份'),2017)   
+#CreateTable()
+#IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)  
+#IndustryEstimation(dbconn,GetIndustryName('格力电器'),2017)   
+#IndustryEstimation(dbconn,GetIndustryName('福耀玻璃'),2017)   
+#IndustryEstimation(dbconn,GetIndustryName('隆基股份'),2017)   
 
+def get_interest_list():
+    '''
+    解析"感兴趣的个股列表.txt",返回list类型的数据供其他模块使用
+    '''
+    list_id = []
+    with open('../SQL/感兴趣的个股列表.txt','r') as fh:
+        s = fh.readline()   #获取更新时间
+        s = fh.readline()   #获取目标长度  
+        
+        lines = fh.readlines()  #获取目标内容
+    for s in lines:
+        code = s[:6]
+        list_id.append(code)    
+    list_id.sort()
+    return list_id  
+
+for s in get_interest_list():
+    IndustryEstimation(dbconn,GetIndustryName(s),2017)
 
 #keys = ['name','age']
 #values=[1,2]

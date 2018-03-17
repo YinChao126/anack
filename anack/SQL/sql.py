@@ -7,7 +7,7 @@ glo._init()
 
 host = 'localhost'
 user = 'root'
-passwd = 'yc5315558'
+passwd = '123456'
 database = 'anack_sql'
 
 glo.set_value('host',host)
