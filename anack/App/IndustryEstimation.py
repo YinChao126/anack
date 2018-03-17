@@ -26,6 +26,8 @@ dbconn=pymysql.connect(
   charset='utf8'
  )
       
+clm = ['行业','年度','企业数量','总市值','平均市值','平均市盈率','平均市净率',
+          '收入增长率','利润增长率','毛利率','净利润率']
 headers = ['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']
 #sql语句示例
 #select 字段 from 表名 where 条件;
@@ -42,17 +44,17 @@ def CreateTable():
     cursor = db.cursor()
     cursor.execute('DROP TABLE IF EXISTS industry_estimation') 
     estimation = """CREATE TABLE IF NOT EXISTS `industry_estimation` (
-                `行业`    varchar(16) DEFAULT NULL,
-                `时间`    varchar(16) DEFAULT NULL,
-                `数量`    varchar(16) DEFAULT NULL,
-                `总市值`    varchar(16) DEFAULT NULL,
-                `平均市值`    varchar(16) DEFAULT NULL,
-                `平均市盈率`    varchar(16) DEFAULT NULL,
-                `平均市净率`    varchar(16) DEFAULT NULL,
-                `收入增长率`    varchar(16) DEFAULT NULL,
-                `利润增长率`    varchar(16) DEFAULT NULL,
-                `毛利率`    varchar(16) DEFAULT NULL,
-                `净利润率`    varchar(16) DEFAULT NULL
+                `行业`    varchar(25) DEFAULT NULL,
+                `年度`    varchar(25) DEFAULT NULL,
+                `企业数量`    int(25) DEFAULT NULL,
+                `总市值`    float(25) DEFAULT NULL,
+                `平均市值`    float(25) DEFAULT NULL,
+                `平均市盈率`    float(25) DEFAULT NULL,
+                `平均市净率`    float(25) DEFAULT NULL,
+                `收入增长率`    float(25) DEFAULT NULL,
+                `利润增长率`    float(25) DEFAULT NULL,
+                `毛利率`    float(25) DEFAULT NULL,
+                `净利润率`    float(25) DEFAULT NULL
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8"""
     cursor.execute(estimation)
     db.commit()
@@ -78,14 +80,8 @@ def GetIndustryName(id):
             return 
  
 #描述：输入行业名，计算出该行业的平均水平
-#输入：数据库用户信息， 行业名， 年度    
-result_df = pd.DataFrame({'行业':"",'年度':"",'企业数量':"",'总市值':"",'平均市值':"",
-                          '平均市盈率':"",'平均市净率':"",'收入增长率':"",'利润增长率':"",
-                          '毛利率':"",'净利润率':""},index=["0"])
+#输入：数据库用户信息， 行业名， 年度     
 def IndustryEstimation(dbconn,industry_name, year):
-    result_df = pd.DataFrame({'行业':"",'年度':"",'企业数量':"",'总市值':"",'平均市值':"",
-                              '平均市盈率':"",'平均市净率':"",'收入增长率':"",'利润增长率':"",
-                              '毛利率':"",'净利润率':""},index=["0"])
 #    industry_name = '汽车制造'   #此处的var如何写到select语句中？   
     #sqlcmd="select code,name from anack_classify where '&var&' in industry"
 #    sqlcmd="select code,name from anack_classify where industry ='汽车制造'"
@@ -195,15 +191,34 @@ def IndustryEstimation(dbconn,industry_name, year):
                 净利润率 += each * target.iloc[i]['weight']
             i+=1
         print('净利润率(%) = ' + str(净利润率))
-        s =  pd.Series([industry_name,year,企业数量,总市值,平均市值,平均市盈率,
-                          平均市净率,收入增长率,利润增长率,毛利率,净利润率])
-        c=pd.DataFrame(s)
-#        df_to_mysql('industry_estimation',c)
-    return c
+        data = {'行业':industry_name,'年度':str(year),'企业数量':企业数量,
+                '总市值':round(总市值/10000,4),'平均市值':round(平均市值/10000,4),'平均市盈率':round(平均市盈率,2),
+                '平均市净率':round(平均市净率,2),'收入增长率':round(收入增长率,2),'利润增长率':round(利润增长率,2),
+                '毛利率':round(毛利率,2),'净利润率':round(净利润率,2)}      
+        result_df = pd.DataFrame(data,columns = clm, index=["0"])
+#        print(result_df)
+        df_to_mysql('industry_estimation',result_df)
+    return result_df
 #IndustryEstimation(dbconn,'家电行业')
 #print(GetIndustryName('福耀玻璃')) 
 CreateTable()
-s = IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)   
+IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)  
+IndustryEstimation(dbconn,GetIndustryName('格力电器'),2017)   
+IndustryEstimation(dbconn,GetIndustryName('福耀玻璃'),2017)   
+IndustryEstimation(dbconn,GetIndustryName('隆基股份'),2017)   
+
+
+#keys = ['name','age']
+#values=[1,2]
+#print(zip(keys,values))
+#dic = dict('name'=1,'age'=2)
+ 
+#d = pd.DataFrame(dic, columns=columns,index=['1'])
+#d.ix[0]
+
+
+
+
 #获取DataFrame中一类数据的标准语法：df.loc[df.property == value]
 #example = pd.DataFrame()
 #for content in tushare_data:
