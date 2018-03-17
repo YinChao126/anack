@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 import pandas as pd
 import pymysql
-#from sqlalchemy import create_engine
+from sqlalchemy import create_engine
 import tushare as ts  
 #import requests
 ## 加上字符集参数，防止中文乱码
@@ -26,19 +26,24 @@ dbconn=pymysql.connect(
   charset='utf8'
  )
       
+headers = ['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']
 #sql语句示例
 #select 字段 from 表名 where 条件;
 #eg:select * from student where sex='男' and age>20; //查询性别是男，并且年龄大于20岁的人。
 
 #创建industry_estimation表头
+def df_to_mysql(table,df):
+    connect = create_engine("mysql+pymysql://"+ users + ":"+ passwords + "@" + hosts + ":3306/" + databases + "?charset=utf8")
+    df.to_sql(name=table,con=connect,if_exists='append',index=False,index_label=False)
+    
 def CreateTable():
     db = pymysql.connect(host = hosts,user = users, password = passwords, 
                          database = databases,charset='utf8')
     cursor = db.cursor()
     cursor.execute('DROP TABLE IF EXISTS industry_estimation') 
     estimation = """CREATE TABLE IF NOT EXISTS `industry_estimation` (
-                `时间`    varchar(16) DEFAULT NULL,
                 `行业`    varchar(16) DEFAULT NULL,
+                `时间`    varchar(16) DEFAULT NULL,
                 `数量`    varchar(16) DEFAULT NULL,
                 `总市值`    varchar(16) DEFAULT NULL,
                 `平均市值`    varchar(16) DEFAULT NULL,
@@ -74,7 +79,13 @@ def GetIndustryName(id):
  
 #描述：输入行业名，计算出该行业的平均水平
 #输入：数据库用户信息， 行业名， 年度    
+result_df = pd.DataFrame({'行业':"",'年度':"",'企业数量':"",'总市值':"",'平均市值':"",
+                          '平均市盈率':"",'平均市净率':"",'收入增长率':"",'利润增长率':"",
+                          '毛利率':"",'净利润率':""},index=["0"])
 def IndustryEstimation(dbconn,industry_name, year):
+    result_df = pd.DataFrame({'行业':"",'年度':"",'企业数量':"",'总市值':"",'平均市值':"",
+                              '平均市盈率':"",'平均市净率':"",'收入增长率':"",'利润增长率':"",
+                              '毛利率':"",'净利润率':""},index=["0"])
 #    industry_name = '汽车制造'   #此处的var如何写到select语句中？   
     #sqlcmd="select code,name from anack_classify where '&var&' in industry"
 #    sqlcmd="select code,name from anack_classify where industry ='汽车制造'"
@@ -94,8 +105,8 @@ def IndustryEstimation(dbconn,industry_name, year):
         print('行业名称输入错误，请重试')
     else: 
         a = ts.get_stock_basics()   #获取的数据
-        tushare_data=a.loc[:,['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']]
-        target = pd.DataFrame(columns = ['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']) #创建一个空的dataframe
+        tushare_data=a.loc[:,headers]
+        target = pd.DataFrame(columns = ['行业','industry','totalAssets','pe','pb','rev','profit','gpr','npr']) #创建一个空的dataframe
         
         for names in industry_id_list.name:
             target = target.append(tushare_data.loc[tushare_data.name == names], ignore_index=True)
@@ -109,7 +120,8 @@ def IndustryEstimation(dbconn,industry_name, year):
         print('行业名：' + industry_name)
         print('行业数量(家) = ' + str(企业数量))
         print('行业总市值(万) = ' + str(总市值))   
-        print('平均市值(万) = ' + str(总市值/企业数量)) 
+        平均市值 = 总市值/企业数量
+        print('平均市值(万) = ' + str(平均市值)) 
         
         weight = []
         for each in target.totalAssets:
@@ -183,10 +195,15 @@ def IndustryEstimation(dbconn,industry_name, year):
                 净利润率 += each * target.iloc[i]['weight']
             i+=1
         print('净利润率(%) = ' + str(净利润率))
-
+        s =  pd.Series([industry_name,year,企业数量,总市值,平均市值,平均市盈率,
+                          平均市净率,收入增长率,利润增长率,毛利率,净利润率])
+        c=pd.DataFrame(s)
+#        df_to_mysql('industry_estimation',c)
+    return c
 #IndustryEstimation(dbconn,'家电行业')
 #print(GetIndustryName('福耀玻璃')) 
-IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)   
+CreateTable()
+s = IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)   
 #获取DataFrame中一类数据的标准语法：df.loc[df.property == value]
 #example = pd.DataFrame()
 #for content in tushare_data:
