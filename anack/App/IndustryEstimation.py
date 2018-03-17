@@ -3,6 +3,9 @@ import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 import tushare as ts  
+
+from SQL.sql import df_to_mysql
+from SQL.glo import get_value
 #import requests
 ## 加上字符集参数，防止中文乱码
 
@@ -34,9 +37,9 @@ headers = ['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']
 #eg:select * from student where sex='男' and age>20; //查询性别是男，并且年龄大于20岁的人。
 
 #创建industry_estimation表头
-def df_to_mysql(table,df):
-    connect = create_engine("mysql+pymysql://"+ users + ":"+ passwords + "@" + hosts + ":3306/" + databases + "?charset=utf8")
-    df.to_sql(name=table,con=connect,if_exists='append',index=False,index_label=False)
+#def df_to_mysql(table,df):
+#    connect = create_engine("mysql+pymysql://"+ users + ":"+ passwords + "@" + hosts + ":3306/" + databases + "?charset=utf8")
+#    df.to_sql(name=table,con=connect,if_exists='append',index=False,index_label=False)
     
 def CreateTable():
     db = pymysql.connect(host = hosts,user = users, password = passwords, 
@@ -61,7 +64,9 @@ def CreateTable():
     cursor.close()
     db.close()    
 
-#描述：输入ID或者股票名称，查看其在anack_classify数据库中所在的行业名
+#函数名：GetIndustryName
+#更新时间：2018-3-17
+#描述：行业翻译器，输入ID或者股票名称，解析其在anack_classify数据库中所在的行业名
 #输入：股票名称或者代码， 比如 "福耀玻璃"或者"600660"都可以
 #输出：行业名称    比如：汽车制造
 #异常处理：如果没有对应信息，输出invalid id input错误提示信息
@@ -81,24 +86,20 @@ def GetIndustryName(id):
  
 #描述：输入行业名，计算出该行业的平均水平
 #输入：数据库用户信息， 行业名， 年度     
-def IndustryEstimation(dbconn,industry_name, year):
-#    industry_name = '汽车制造'   #此处的var如何写到select语句中？   
-    #sqlcmd="select code,name from anack_classify where '&var&' in industry"
-#    sqlcmd="select code,name from anack_classify where industry ='汽车制造'"
-#    print(sqlcmd)
-#    print(type(sqlcmd))
+def Estimation(dbconn,industry_name, year):
+    '''
+    年度信息还没有用上
+    '''
     sqlcmd="select code,name from anack_classify where industry ='%s'" %(industry_name)
-#    print(sqlcmd)
-#    print(type(sqlcmd))
       
     #利用pandas 模块导入mysql数据
     a=pd.read_sql(sqlcmd,dbconn)
-    #取前5行数据
     industry_id_list=a[:]
 #    print(a)
     
     if len(a) == 0:
         print('行业名称输入错误，请重试')
+        return 0
     else: 
         a = ts.get_stock_basics()   #获取的数据
         tushare_data=a.loc[:,headers]
@@ -198,54 +199,35 @@ def IndustryEstimation(dbconn,industry_name, year):
         result_df = pd.DataFrame(data,columns = clm, index=["0"])
 #        print(result_df)
         df_to_mysql('industry_estimation',result_df)
-    return result_df
-#IndustryEstimation(dbconn,'家电行业')
+        return result_df
+
+
+# App示例代码，用完删掉
+
+
+#Estimation(dbconn,'家电行业')
 #print(GetIndustryName('福耀玻璃')) 
 #CreateTable()
-#IndustryEstimation(dbconn,GetIndustryName('宁沪高速'),2017)  
-#IndustryEstimation(dbconn,GetIndustryName('格力电器'),2017)   
-#IndustryEstimation(dbconn,GetIndustryName('福耀玻璃'),2017)   
-#IndustryEstimation(dbconn,GetIndustryName('隆基股份'),2017)   
+#Estimation(dbconn,GetIndustryName('宁沪高速'),2017)  
+#Estimation(dbconn,GetIndustryName('格力电器'),2017)   
+#Estimation(dbconn,GetIndustryName('福耀玻璃'),2017)   
+#Estimation(dbconn,GetIndustryName('隆基股份'),2017)   
 
-def get_interest_list():
-    '''
-    解析"感兴趣的个股列表.txt",返回list类型的数据供其他模块使用
-    '''
-    list_id = []
-    with open('../SQL/感兴趣的个股列表.txt','r') as fh:
-        s = fh.readline()   #获取更新时间
-        s = fh.readline()   #获取目标长度  
-        
-        lines = fh.readlines()  #获取目标内容
-    for s in lines:
-        code = s[:6]
-        list_id.append(code)    
-    list_id.sort()
-    return list_id  
-
-for s in get_interest_list():
-    IndustryEstimation(dbconn,GetIndustryName(s),2017)
-
-#keys = ['name','age']
-#values=[1,2]
-#print(zip(keys,values))
-#dic = dict('name'=1,'age'=2)
- 
-#d = pd.DataFrame(dic, columns=columns,index=['1'])
-#d.ix[0]
-
-
-
-
-#获取DataFrame中一类数据的标准语法：df.loc[df.property == value]
-#example = pd.DataFrame()
-#for content in tushare_data:
-#    example = example.append(tushare_data.loc[tushare_data.industry == '汽车配件'])
-#print(example)
-
-
-
-#3. 总市值
-#         name industry area       pe  outstanding  totals   totalAssets  \
-#code                                                                      
-#002226   江南化工     化工原料   安徽    72.51         9.11   12.49  5.143744e+05
+#def get_interest_list():
+#    '''
+#    解析"感兴趣的个股列表.txt",返回list类型的数据供其他模块使用
+#    '''
+#    list_id = []
+#    with open('../SQL/感兴趣的个股列表.txt','r') as fh:
+#        s = fh.readline()   #获取更新时间
+#        s = fh.readline()   #获取目标长度  
+#        
+#        lines = fh.readlines()  #获取目标内容
+#    for s in lines:
+#        code = s[:6]
+#        list_id.append(code)    
+#    list_id.sort()
+#    return list_id  
+#
+#for s in get_interest_list():
+#    Estimation(dbconn,GetIndustryName(s),2017)
