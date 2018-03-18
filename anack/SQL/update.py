@@ -1,24 +1,17 @@
 '''
 本模块用于更新数据库
 '''
-
-import finnance_to_sql as f
-import k_data_to_sql as k
-import macro_to_sql as m
-
-
 from SQL.classify_to_sql import classify_info_to_sql
 from SQL.macro_to_sql import macro_info_to_sql
 from SQL.k_data_to_sql import create_k_table
 from SQL.k_data_to_sql import k_data
 
   
-def get_interest_list(filepath):
+def get_interest_list(filename):
     '''
     解析"感兴趣的个股列表.txt",返回list类型的数据供其他模块使用
     '''
     list_id = []
-    filename = filepath + '感兴趣的个股列表.txt'
     with open(filename,'r') as fh:
         s = fh.readline()   #获取更新时间
         s = fh.readline()   #获取目标长度  
