@@ -5,23 +5,12 @@ from sqlalchemy import create_engine
 import tushare as ts  
 
 import App.IndustryEstimation
+from SQL.sql import pymysql_connect
+
+dbconn=pymysql_connect()
 
 
-
-
-  
-dbconn=pymysql.connect(
-  host="localhost",
-  database="anack_sql",
-  user="yinchao",
-  password="123456",
-  port=3306,
-  charset='utf8'
- )
-
-
-
-#App.IndustryEstimation.CreateTable() #此处开启则清空此前所有内容
+App.IndustryEstimation.CreateTable() #此处开启则清空此前所有内容
 name = App.IndustryEstimation.GetIndustryName('000651')
 App.IndustryEstimation.Estimation(dbconn,name,2017)
 name = App.IndustryEstimation.GetIndustryName('601012')

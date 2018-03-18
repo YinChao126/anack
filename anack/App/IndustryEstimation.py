@@ -1,11 +1,12 @@
 # -*- coding:utf-8 -*- 
 import pandas as pd
-import pymysql
-from sqlalchemy import create_engine
+#import pymysql
+#from sqlalchemy import create_engine
 import tushare as ts  
 
+from SQL.sql import pymysql_connect
 from SQL.sql import df_to_mysql
-from SQL.glo import get_value
+#from SQL.glo import get_value
 #import requests
 ## 加上字符集参数，防止中文乱码
 
@@ -14,20 +15,8 @@ from SQL.glo import get_value
 #扩展：资产负债率、市净率、市现率、市销率（需要根据财务报表获取）
 #自定义：
 
-#
-hosts="localhost"
-databases="anack_sql"
-users="yinchao"
-passwords="123456"
   
-dbconn=pymysql.connect(
-  host="localhost",
-  database="anack_sql",
-  user="yinchao",
-  password="123456",
-  port=3306,
-  charset='utf8'
- )
+dbconn=pymysql_connect()
       
 clm = ['行业','年度','企业数量','总市值','平均市值','平均市盈率','平均市净率',
           '收入增长率','利润增长率','毛利率','净利润率']
@@ -36,14 +25,9 @@ headers = ['name','industry','totalAssets','pe','pb','rev','profit','gpr','npr']
 #select 字段 from 表名 where 条件;
 #eg:select * from student where sex='男' and age>20; //查询性别是男，并且年龄大于20岁的人。
 
-#创建industry_estimation表头
-#def df_to_mysql(table,df):
-#    connect = create_engine("mysql+pymysql://"+ users + ":"+ passwords + "@" + hosts + ":3306/" + databases + "?charset=utf8")
-#    df.to_sql(name=table,con=connect,if_exists='append',index=False,index_label=False)
-    
+#创建industry_estimation表头    
 def CreateTable():
-    db = pymysql.connect(host = hosts,user = users, password = passwords, 
-                         database = databases,charset='utf8')
+    db = pymysql_connect()
     cursor = db.cursor()
     cursor.execute('DROP TABLE IF EXISTS industry_estimation') 
     estimation = """CREATE TABLE IF NOT EXISTS `industry_estimation` (
