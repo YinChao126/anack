@@ -4,24 +4,12 @@ Created on Sun Mar  4 14:21:14 2018
 
 @author: Administrator
 """
-
 import pandas as pd
-import pymysql
-
 import tushare as ts
-#import glo
 from SQL.sql import pymysql_connect
 from SQL.sql import df_to_mysql
 
-#------------------------------------------------------------------------------
-#hosts = glo.get_value('host')
-#users = glo.get_value('user')
-#passwords = glo.get_value('passwd')
-#databases = glo.get_value('database')
-#------------------------------------------------------------------------------
-
 def create_classify_table():
-#    db = pymysql.connect(host = hosts,user = users, password = passwords, database = databases,charset='utf8')
     db = pymysql_connect()
     cursor = db.cursor()
     cursor.execute('DROP TABLE IF EXISTS anack_classify') 
@@ -69,4 +57,4 @@ def classify_info_to_sql():
     df_to_mysql('anack_classify',result)
     
 #    -------------------------------------------------------------
-#classify_info_to_sql()#每次调用都会更新
+classify_info_to_sql()#每次调用都会更新
