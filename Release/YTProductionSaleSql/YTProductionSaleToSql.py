@@ -248,6 +248,7 @@ class ProductionSaleToSql:
     def ProSaleUpdate(self):
         
         #配置产销快报页面参数，实现pdf自动下载  
+        self.CreatePSTable()
         try:
             fp = webdriver.FirefoxProfile()
             fp.set_preference("browser.download.folderList", 2)
