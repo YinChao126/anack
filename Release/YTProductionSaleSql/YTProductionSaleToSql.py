@@ -2,13 +2,21 @@
 # 更新日期：2018-3-25
 # 版本号：V0.1
 # 描述：实现了宇通客车产销数据的自动入库
+#环境搭建：
+#1、安装firefox浏览器
+#2、安装selenium库（pip install selenium）
+#3、安装selenium webdriver浏览器驱动
+#   地址：https://github.com/mozilla/geckodriver/releases/   下载geckodriver-vo.20.0-win64.zip或geckodriver-vo.20.0-win32.zip
+#   下载解压后，将geckodriver.exe发到Python的安装目录，例如 D:\python 。 然后再将Python的安装目录添加到系统环境变量的Path下面。
+#4、安装autoit 地址：https://www.autoitscript.com/site/autoit/downloads/ 默认安装即可
 # 使用说明：
 # 1. 请将UpfileWithPara.exe（用于文件上传）文件下载到本地，并把其路径赋值给ExeAdr
 # 2. 确保DownloadAdr下没有任何重要的文件，因为程序会将DownloadAdr文件夹下面的所有文件清空
 # 3. 起始年月默认为2017.6，根据需要修改
-# 4. 确保电脑上安装了firefox浏览器，selenium库（pip安装即可）
-
-
+# 4. 输入连接数据库的用户名、密码等，点击运行即可
+# 版本缺点
+# 1、依赖在线pdf转excel网站，转换出来的excel可能发生格式错位
+# 2、模拟网页操作，速度相对较慢
 #--------------------------------------------------------------------
 
 import pymysql
@@ -56,7 +64,8 @@ class ProductionSaleToSql:
         #文件夹必须清理干净，否则会影响后面的流程
         if os.listdir(self.DownloadAdr):   #如果文件夹没有清理干净，抛出异常
             raise FolderNotCleanException
-        
+    
+   #在目录下查询excel文档    
     def FindExcelFile(self):
         ExcelPath = ""
         for i in os.listdir(self.DownloadAdr):
@@ -67,7 +76,8 @@ class ProductionSaleToSql:
             return ExcelPath
         else:
             raise UnfoundExcelFileException
-        
+      
+    #建表
      #命名规则 P：生产量 S：销售量  SPLY：去年同期
     def CreatePSTable(self):
         cmd = '''CREATE TABLE IF NOT EXISTS `ProductionSale` (
@@ -132,6 +142,7 @@ class ProductionSaleToSql:
         cursor.close()
         db.close()
     
+    #数据库插入
     def InsertPSTable(self):
         sql = '''INSERT INTO `ProductionSale` (`stock_code`,`stock_name`,`year`,`month`)
                  VALUES (600360,'宇通客车',2018,3)'''
@@ -142,7 +153,7 @@ class ProductionSaleToSql:
         cursor.close()
         db.close()
         
-        
+    #数据库查询，返回查询结果  
     def QueryPSTable(self,years,months):
         
         sql = "SELECT * FROM `ProductionSale` WHERE `stock_code`="+self.stock_code+" AND `year`="+years+" AND `month`="+months
@@ -162,7 +173,7 @@ class ProductionSaleToSql:
         
 
     
-    
+    #excel文件入库
     def ExcelToSql(self,ExcelAdr,Year,Month):
         data = xlrd.open_workbook(ExcelAdr)
         table =data.sheets()[0]
@@ -246,7 +257,7 @@ class ProductionSaleToSql:
     
 
     def ProSaleUpdate(self):
-        
+        self.CreatePSTable()
         #配置产销快报页面参数，实现pdf自动下载  
         self.CreatePSTable()
         try:
@@ -323,9 +334,9 @@ class ProductionSaleToSql:
                 else:
                     pass
         finally:
-            self.FolderClean()
             driver.quit()
             driverEx.quit()
+            self.FolderClean()
             
      
 if __name__ == "__main__":
@@ -335,7 +346,8 @@ if __name__ == "__main__":
     stock_code = "600066"
     StockName = "宇通客车"
     DownloadAdr = "d:\\downloadTest"
-    ExeAdr=r"E:\JianLpeng\DailyWork\WorkSpace\PythonSpace\YTProductionSaleSql\UpfileWithPara.exe"
+    #ExeAdr=r"E:\JianLPeng\Project\Anack\anack\Release\YTProductionSaleSql\UpfileWithPara.exe" #绝对路径
+    ExeAdr="UpfileWithPara.exe"   #如果UpfileWithPara.exe在同一个文件夹下可以使用相对路径
     Update = ProductionSaleToSql()
     Update.ParametersSet(user=user,password=password,database=database,stock_code=stock_code,StockName=StockName,DownloadAdr=DownloadAdr,ExeAdr=ExeAdr,YearBegin = 2017,MonthBegin = 6)
     Update.ProSaleUpdate()
