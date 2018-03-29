@@ -141,11 +141,11 @@ def CreateTable_industry_avg():
     
     
 # =============================================================================
-#调试使用
-#CreateTable()
-#Estimation()
-#industry_stat('通信设备')
-#CreateTable_industry_avg()
+# #调试使用
+# CreateTable()
+# Estimation()
+# industry_stat('通信设备')
+# CreateTable_industry_avg()
 # =============================================================================
 
 

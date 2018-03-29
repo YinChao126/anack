@@ -37,3 +37,4 @@ stock_code_num = ['600000' ,'600004' ,'600005' ,'600006' ,'600007' ,'600008' ,'6
 # App.IndustryEstimation_detail.Estimation() #入库
 # =============================================================================
 App.IndustryEstimation_detail.industry_stat('通信设备')
+App.IndustryEstimation_detail.CreateTable_industry_avg()
