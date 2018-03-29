@@ -5,9 +5,9 @@ from sqlalchemy import create_engine
 #
 #glo._init()
 
-hosts = 'localhost'
-users = 'root'
-passwds = '123456'
+hosts = '10.109.43.131'
+users = 'Test2'
+passwds = 'sql123'
 databases = 'anack_sql'
 
 #glo.set_value('host',host)
