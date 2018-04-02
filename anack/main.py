@@ -4,6 +4,7 @@ import App.IndustryEstimation
 from SQL.sql import pymysql_connect
 from SQL.update import get_interest_list
 import App.IndustryEstimation_detail
+import App.Detail_Stock_Selector
 
 industry_check = []
 dbconn=pymysql_connect()
@@ -33,8 +34,10 @@ stock_code_num = ['600000' ,'600004' ,'600005' ,'600006' ,'600007' ,'600008' ,'6
 
 #行业平均数据明细
 # =============================================================================
-# App.IndustryEstimation_detail.CreateTable() #此处开启则清空此前所有内容
-# App.IndustryEstimation_detail.Estimation() #入库
+App.IndustryEstimation_detail.CreateTable() #此处开启则清空此前所有内容
+App.IndustryEstimation_detail.Estimation() #入库
 # =============================================================================
-App.IndustryEstimation_detail.industry_stat('通信设备')
+#App.IndustryEstimation_detail.industry_stat('通信设备')
 App.IndustryEstimation_detail.CreateTable_industry_avg()
+#筛选基本面数据优于行业平均值的股票并入库，20170330
+App.Detail_Stock_Selector.stock_detail_select(300,50)
