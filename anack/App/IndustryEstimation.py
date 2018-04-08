@@ -185,7 +185,12 @@ def Estimation(dbconn,industry_name, year):
         df_to_mysql('industry_estimation',result_df)
         return result_df
 
-
+#获取所有行业平均数据用于测试
+def Get_all_industry_average_data():
+    a = ts.get_stock_basics()
+    for i in range(0,len(a)):
+        print('industry:',a.iloc[i,1])
+        test=Estimation(dbconn,a.iloc[i,1],2017)
 # App示例代码，用完删掉
 
 
