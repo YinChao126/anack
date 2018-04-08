@@ -39,6 +39,7 @@ App.IndustryEstimation_detail.Estimation() #入库
 # =============================================================================
 #App.IndustryEstimation_detail.industry_stat('通信设备')
 
+
 #行业平均数据统计值入库
 App.IndustryEstimation_detail.CreateTable_industry_avg()
 
