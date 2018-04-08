@@ -38,6 +38,13 @@ App.IndustryEstimation_detail.CreateTable() #此处开启则清空此前所有�
 App.IndustryEstimation_detail.Estimation() #入库
 # =============================================================================
 #App.IndustryEstimation_detail.industry_stat('通信设备')
+
+#行业平均数据统计值入库
 App.IndustryEstimation_detail.CreateTable_industry_avg()
-#筛选基本面数据优于行业平均值的股票并入库，20170330
-App.Detail_Stock_Selector.stock_detail_select(300,50)
+
+
+# =============================================================================
+# #筛选基本面数据优于行业平均值的股票并入库，20170330
+# App.Detail_Stock_Selector.stock_detail_select(300,50)
+# 
+# =============================================================================

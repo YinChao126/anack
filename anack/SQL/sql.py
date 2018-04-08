@@ -5,10 +5,10 @@ from sqlalchemy import create_engine
 #
 #glo._init()
 
-hosts = ' '
-users = ' '
-passwds = ' '
-databases = ' '
+hosts = ''
+users = ''
+passwds = ''
+databases = ''
 
 #glo.set_value('host',host)
 #glo.set_value('user',user)
