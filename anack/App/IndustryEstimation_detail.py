@@ -50,8 +50,8 @@ npr,净利润率(%)
 holders,股东人数
 '''
 
-
-#行业平均值明细数据入库
+#作用：行业平均值明细数据入库
+#输出：入库行业平均值明细，便于后续分析
 def CreateTable():
     db = pymysql_connect()
     cursor = db.cursor()
@@ -95,6 +95,7 @@ def Estimation():
 
 
 
+
 #作用：查看行业平均值统计
 #输入：行业名称
 #输出：行业平均统计数
@@ -111,6 +112,8 @@ def industry_stat(industry):
 
 
 
+#作用：查看行业平均值统计
+#输出：所有行业平均统计数(筛选条件:PE <100,pb <10,1000>rev>-1000,1000>profit>-1000,,1000>gpr>-1000,,1000>npr>-1000)
 def CreateTable_industry_avg():
     db = pymysql_connect()
     cursor = db.cursor()  
