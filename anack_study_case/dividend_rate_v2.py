@@ -92,11 +92,12 @@ class dividend_rate:
         stock = ts.get_hist_data(self.id)
         df = dividend_rate.get_bonus_table(self)
         df_dividend = df[['年度','派息','登记日']]
-        
+        print(df_dividend)
         stock_close_price = stock["close"]
         sIndex = stock_close_price.index.tolist()
         # 获取登记日
         regis = df_dividend['登记日'].tolist()
+#        print(regis)
         close_price = []
         diVi = []
         aIn = []
@@ -109,16 +110,23 @@ class dividend_rate:
                 aDiv = df_dividend[df_dividend['登记日'] == i]['派息'].tolist()[0]
                 diVi.append(aDiv)
                 aIn.append(i)
-                
+        print(diVi)        
+        print(close_price)
         div_ratio = []
         for i,j in zip(diVi,close_price):
-            adivr = float(i) / float(j)
+            adivr = float(i) / float(j) / 10 * 100
             div_ratio.append(adivr)
         
         reDf = pd.DataFrame({"dividend":diVi,"close_price":close_price,
-                             "dividend_ratio":div_ratio},index = aIn)
+                             "dividend_ratio(%)":div_ratio},index = aIn)
         return reDf
 
 a = dividend_rate('601012')
 s = a.divident_rate
 print(s)
+#获取的股息率完全正确，已确定。接下来需要获取分红率
+#分红率1 = 每股派息 / 每股利润
+#分红率2 = 每股派息 * 股本 / 总利润
+#ts.get_report_data(2016,4)
+#ts.get_profit_data(2014,4)
+##############################################
