@@ -119,6 +119,8 @@ class dividend_rate:
                 target_eps = profit_table[profit_table['code'] == self.id]['eps'].values
                 eps = target_eps[0].item()  #numpy.float64 -> float
                 per_bonus = round(float(aDiv) / 10 / eps * 100, 2)
+#                per_bonus = 1   #测试时开启
+                
                 bonus.append(per_bonus)
 
                 diVi.append(float(aDiv)/10) #10股派息转1股派息
@@ -133,14 +135,17 @@ class dividend_rate:
                              'ape':aPe, #真实市盈率
                              'bonus_ratio(%)':bonus #分红率
                              },index = div_year)
+                
+        # 统计输出
+        print(self.id + '分红情况统计如下：')
+        avg_bonus = round(sum(bonus)/len(bonus),2)
+        print('1.平均分红率:',avg_bonus,'%')
+        avg_div = round(sum(div_ratio)/len(div_ratio),2)
+        print('2.平均股息率:',avg_div,'%')
+        print('3.详细列表如下所示')
         return reDf
 
-a = dividend_rate('000651')
+##############################################
+a = dividend_rate('601012')
 s = a.divident_rate
 print(s)
-#获取的股息率完全正确，已确定。接下来需要获取分红率
-#分红率1 = 每股派息 / 每股利润
-#分红率2 = 每股派息 * 股本 / 总利润
-#ts.get_report_data(2016,4)
-#ts.get_profit_data(2014,4)
-##############################################
