@@ -9,6 +9,7 @@ Created on Mon Mar 26 21:29:43 2018
 """
 import tushare as ts
 import pandas as pd
+import numpy as np
 import requests
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
@@ -101,39 +102,37 @@ class dividend_rate:
 #        print(regis)
         close_price = []
         diVi = []
-        aIn = []
         aPe = []
         bonus = []
         div_year = []
         for i in regis:
             if i != "--" and i in sIndex:
-#                print(i)
                 cprice = stock_close_price.loc[i]
                 close_price.append(cprice)
                 aDiv = df_dividend[df_dividend['登记日'] == i]['派息'].tolist()[0]
-
                 year = df_dividend[df_dividend['登记日'] == i]['年度'].values #获得年份
-                div_year.append(year)
+                div_year.append(year[0])
                 
+                #此处的bonus暂时通过ts获得，以后可以直接搜索本地数据库
                 profit_table = ts.get_report_data(year[0],4) #获取年度eps
-                target_eps = profit_table[profit_table['code'] == self.id]['eps']
-                bonus.append(float(aDiv) / 10 / float(target_eps) * 100)
-#                print(target_eps)
+                print('')
+                target_eps = profit_table[profit_table['code'] == self.id]['eps'].values
+                eps = target_eps[0].item()  #numpy.float64 -> float
+                per_bonus = round(float(aDiv) / 10 / eps * 100, 2)
+                bonus.append(per_bonus)
 
-                diVi.append(aDiv)
-                aIn.append(i)
-#        print(diVi)        
-#        print(close_price)
+                diVi.append(float(aDiv)/10) #10股派息转1股派息
         div_ratio = []
         for i,j in zip(diVi,close_price):
-            adivr = float(i) / float(j) / 10 * 100
-            div_ratio.append(adivr)
+            adivr = float(i) / float(j) * 100
+            div_ratio.append(round(adivr,2))
             aPe.append(round(100/adivr,2))
-        
-        reDf = pd.DataFrame({"dividend":diVi,
-                             "dividend_ratio(%)":div_ratio,
-                             'ape':aPe,
-                             'bonus(%)':bonus},index = aIn)
+
+        reDf = pd.DataFrame({"cash_div":diVi,   #每股派现方案
+                             "div_ratio(%)":div_ratio, #股息率
+                             'ape':aPe, #真实市盈率
+                             'bonus_ratio(%)':bonus #分红率
+                             },index = div_year)
         return reDf
 
 a = dividend_rate('000651')
