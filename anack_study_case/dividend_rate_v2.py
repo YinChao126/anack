@@ -92,36 +92,51 @@ class dividend_rate:
         stock = ts.get_hist_data(self.id)
         df = dividend_rate.get_bonus_table(self)
         df_dividend = df[['年度','派息','登记日']]
-        print(df_dividend)
+#        print(df_dividend)
         stock_close_price = stock["close"]
         sIndex = stock_close_price.index.tolist()
         # 获取登记日
         regis = df_dividend['登记日'].tolist()
+#        print(sIndex)
 #        print(regis)
         close_price = []
         diVi = []
         aIn = []
-        
+        aPe = []
+        bonus = []
+        div_year = []
         for i in regis:
             if i != "--" and i in sIndex:
-                # print(i)
+#                print(i)
                 cprice = stock_close_price.loc[i]
                 close_price.append(cprice)
                 aDiv = df_dividend[df_dividend['登记日'] == i]['派息'].tolist()[0]
+
+                year = df_dividend[df_dividend['登记日'] == i]['年度'].values #获得年份
+                div_year.append(year)
+                
+                profit_table = ts.get_report_data(year[0],4) #获取年度eps
+                target_eps = profit_table[profit_table['code'] == self.id]['eps']
+                bonus.append(float(aDiv) / 10 / float(target_eps) * 100)
+#                print(target_eps)
+
                 diVi.append(aDiv)
                 aIn.append(i)
-        print(diVi)        
-        print(close_price)
+#        print(diVi)        
+#        print(close_price)
         div_ratio = []
         for i,j in zip(diVi,close_price):
             adivr = float(i) / float(j) / 10 * 100
             div_ratio.append(adivr)
+            aPe.append(round(100/adivr,2))
         
-        reDf = pd.DataFrame({"dividend":diVi,"close_price":close_price,
-                             "dividend_ratio(%)":div_ratio},index = aIn)
+        reDf = pd.DataFrame({"dividend":diVi,
+                             "dividend_ratio(%)":div_ratio,
+                             'ape':aPe,
+                             'bonus(%)':bonus},index = aIn)
         return reDf
 
-a = dividend_rate('601012')
+a = dividend_rate('000651')
 s = a.divident_rate
 print(s)
 #获取的股息率完全正确，已确定。接下来需要获取分红率
