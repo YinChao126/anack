@@ -1,0 +1,266 @@
+Mysql 基础常用操作
+
+链接Mysql：
+格式： mysql -h主机地址 -u用户名 －p用户密码
+
+连接到本机上的MYSQL
+
+键入命令mysql-uroot -p，回车后提示你输密码，如果刚安装好MYSQL，超级用户root是没有密码的，故直接回车即可进入到MYSQL中了，MYSQL的提示符是：mysql>
+
+连接到远程主机上的MYSQL
+
+假设远程主机的IP为：10.0.0.1，用户名为root,密码为12356。则键入以下命令：
+mysql -h10.0.0.1 -uroot -p12356
+
+退出MYSQL命令 
+exit （回车）
+
+
+
+库操作：
+
+--- 创建数据库：
+CREATE DATABASE mysqltest;
+
+--- 查看数据库
+show databases;
+
+--- 的数据表： 
+use mysql；
+show tables;
+
+--- 创建带带字符集的数据库（存储数据中含有中文时常用）
+CREATE DATABASE my_chinese CHARACTER SET=utf8;
+
+--- 创建带校验的数据库
+CREATE DATABASE mydb CHARACTER SET=utf8 COLLATE utf8_general_ci; 
+
+--- 显示数据库创建语句(详情)：
+SHOW CREATE DATABASE mydb3;
+
+--- 数据库删除语句：
+DROP DATABASE  mydb3;
+
+
+--- 修改数据库的库字符编码
+ALTER  DATABASE  mydb2 character set gb2312;
+
+
+--- 表操作
+
+
+
+---创建数据库表
+ create table employee
+(
+    id int,
+    name varchar(40),
+    sex  char(4),
+    birthday date,
+    Entry_date date,
+    job  varchar(100),
+    salary  Decimal(8,2),
+    resume  Text
+);
+
+
+--- 在上面员工表的基本上增加一个image列。
+alter table employee add image blob;
+
+--- 修改job列，使其长度为60。
+alter table employee modify job varchar(60);
+
+--- 删除sex列。
+alter table employee drop image;
+
+--- 表名改为user。
+rename table employee to user;
+
+--- 修改表的字符集为utf-8
+alter table user character set gbk;
+alter table user character set utf8;
+
+--- 列名name修改为username
+alter table user change column name username varchar(100);
+--- 删除表
+drop table user;
+
+--- 增删改查
+--- 准备表
+create table employee
+(
+id int,
+name varchar(40),
+sex varchar(4),
+birthday date,
+entry_date date,
+salary decimal(8,2),
+resume text
+);
+
+--- 插入数据
+insert into employee(id,name,sex,birthday,entry_date,salary,resume) values(1,'zhangsan','male','1993-03-04','2016-11-10','1000','i am a developer');
+
+--- 可以省略表字段，但是必须插入全部字段
+insert into employee values(null,null,'male','1993-03-04','2016-11-10','1000','i am a developer');
+
+---指定某些列插入数据
+insert into employee(id) values(6);
+
+---插入汉字
+insert into employee(id,name) values(6,'张三');
+
+--- mysql客户采用gb2312编码
+show variables like 'chara%';
+set character_set_client=gb2312;
+insert into employee(id,username) values('3','张三');
+
+
+---查看时不乱码
+show variables like 'chara%';
+set character_set_results=gb2312;
+select * from employee;
+
+---修改表数据
+---将所有员工薪水修改为5000元。
+update employee set salary=5000;
+
+
+---将姓名为’zs’的员工薪水修改为3000元。
+update employee set salary = 3000 where name='zhangsan';
+
+
+---将姓名为’aaa’的员工薪水修改为4000元,job改为ccc。
+update employee set salary = 4000,job='ccc' where name='张三';
+
+
+--- 将wu的薪水在原有基础上增加1000元。
+update employee set salary = salary+1000 where name='张三';
+
+---删除
+---删除表中名称为’zs’的记录。
+delete from employee where job='ccc';
+
+
+---删除表中所有记录。
+delete from employee;
+
+
+---使用truncate删除表中记录
+truncate table employee;
+
+---查询
+
+---查询表中所有学生的信息。
+select id,name,chinese,english,math from student;
+
+
+---查询表中所有学生的姓名和对应的英语成绩。
+select name,english from student;
+
+
+---过滤表中重复数据。
+select distinct english from student;
+
+---在所有学生分数上加10分特长分。
+select name,(chinese+english+math)+10 from  student;
+
+
+---统计每个学生的总分。
+select name,(chinese+english+math) from  student;
+
+
+---使用别名表示学生分数
+select name,(chinese+english+math) as 总分 from  student;
+---可以不用as
+select name,(chinese+english+math) 总分 from  student;
+
+
+---查询姓名为wu的学生成绩
+select * from student where name='张三';
+
+
+---查询英语成绩大于90分的同学
+select * from student where  english>'90';
+
+
+--- 显示数据表的结构： 
+describe 表名;
+--- 简写
+desc 表名;
+
+--- 建表： 
+use 库名; 
+create table 表名 (字段设定列表);
+
+--- 删库和删表: 
+drop database 库名;
+drop table 表名;
+
+--- 表中记录清空： 
+truncate table wp_comments;
+delete * from wp_comments;
+--- 2种操作模式的区别，目标对象是表wp_comments，其中truncate操作中的table可以省略，delete操作中的*可以省略。这两者都是将wp_comments表中数据清空，不过也是有区别的，如下：truncate是整体删除（速度较快），delete是逐条删除（速度较慢）。truncate不写服务器log，delete写服务器log，也就是truncate效率比delete高的原因。truncate不激活trigger(触发器)，但是会重置Identity（标识列、自增字段），相当于自增列会被置为初始值，又重新从1开始记录，而不是接着原来的ID数。而delete删除以后，Identity依旧是接着被删除的最近的那一条记录ID加1后进行记录。如果只需删除表中的部分记录，只能使用DELETE语句配合where条件。 DELETE FROM wp_comments WHERE……
+
+--- 显示表中的记录： 
+select * from 表名
+
+
+--- 数据库备份与恢复
+
+--- 备份：从数据库导出数据：
+--- 格式：mysqldump -h链接ip -P(大写)端口 -u用户名 -p密码数据库名>d:XX.sql(路劲)
+mysqldump -h132.72.192.432 -P3307 -uroot -p8888 htgl>d:\htgl.sql;
+
+
+--- 备份导出示例
+---导出数据和表结构——将特定数据库特定表中的数据和表格结构和数据全部返回
+mysqldump --u  b_user -h 101.3.20.33 -p'H_password'  -P3306 database_di up_subjects > 0101_0630_up_subjects.sql
+
+
+--- 导出表结构却不导出表数据——只返回特定数据库特定表格的表格结构，不返回数据,添加“-d”命令参数
+mysqldump --u  b_user -h 101.3.20.33 -p'H_password'  -P3306 -d database_di up_subjects > 0101_0630_up_subjects.sql
+
+
+---导出表结构和满足挑顶条件的表数据——只返回特定数据库中特定表的表格结构和满足特定条件的数据 
+mysqldump --u  b_user -h 101.3.20.33 -p'H_password'  -P3306 database_di up_subjects --where=" ctime>'2017-01-01' and ctime<'2017-06-30'" > 0101_0630_up_subjects.sql
+
+--- 导出数据却不导出表结构——只返回特定数据库中特定表格的数据，不返回表格结构，添加“-t”命令参数
+mysqldump --u  b_user -h 101.3.20.33 -p'H_password' -t -P3306 database_di up_subjects  >0101_0630_up_subjects.sql
+
+--- 导出特定数据库的所有表格的表结构及其数据，添加“--databases ”命令参数
+mysqldump  --u  b_user -h 101.3.20.33 -p'H_password' -P3306
+--databases test  > all_database.sql
+
+--- 恢复，导入数据库数据
+--- 将导出的本地文件导入到指定数据库
+--- 系统命令行
+--- 格式：mysql -h链接ip -P(大写)端口 -u用户名 -p密码 数据库名 < d:XX.sql(路劲) 
+mysql -uusername -ppassword db1 <tb1tb2.sql
+
+
+--- mysql命令行
+user db1;
+source tb1_tb2.sql;
+
+--- 恢复整个数据库的方法：
+mysql -u  b_user -h 101.3.20.33 -p'H_password' -P3306   < all_database.sql
+
+
+--- mysqldump字符集设置
+mysqldump -uusername -ppassword --default-character-set=gb2312 db1 table1 > tb1.sql
+
+--- mysqldump客户端可用来转储数据库或搜集数据库进行备份或将数据转移到另一个sql服务器(不一定是一个mysql服务器)。转储包含创建表和/或装载表的sql语句。
+
+
+--- 导出全部数据库
+--all-databases  , -A
+mysqldump -uroot -p --all-databases
+
+
+---导出全部表空间。
+--all-tablespaces  , -Y
+mysqldump -uroot -p --all-databases --all-tablespaces
+
+
+
