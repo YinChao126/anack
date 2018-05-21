@@ -12,7 +12,7 @@
 '''
 
 import pandas as pd
-import tushare as ts  
+import tushare as ts
 
 
 '''
