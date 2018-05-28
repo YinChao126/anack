@@ -74,7 +74,7 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_operation_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_yingyun = pd.merge(result_yingyun, result_1, on='code',how='left')
-result_yingyun = result_yinli.drop_duplicates()
+result_yingyun = result_yingyun.drop_duplicates()
 result_yingyun.to_csv('D:/999github/anack/M1809/result_yingyun.csv',index =False)
 '''
 成长能力表
@@ -103,7 +103,7 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_growth_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_chengzhang = pd.merge(result_chengzhang, result_1, on='code',how='left')
-result_chengzhang = result_yinli.drop_duplicates()
+result_chengzhang = result_chengzhang.drop_duplicates()
 result_chengzhang.to_csv('D:/999github/anack/M1809/result_chengzhang.csv',index =False)
 '''
 偿债能力表
@@ -132,7 +132,7 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_debtpaying_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_changzhai = pd.merge(result_changzhai, result_1, on='code',how='left')
-result_changzhai = result_yinli.drop_duplicates()
+result_changzhai = result_changzhai.drop_duplicates()
 result_changzhai.to_csv('D:/999github/anack/M1809/result_changzhai.csv',index =False)
 '''
 现金流量表
@@ -160,6 +160,6 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_cashflow_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_xianjin = pd.merge(result_xianjin, result_1, on='code',how='left')
-result_xianjin = result_yinli.drop_duplicates()
+result_xianjin = result_xianjin.drop_duplicates()
 result_xianjin.to_csv('D:/999github/anack/M1809/result_xianjin.csv',index =False)
 
