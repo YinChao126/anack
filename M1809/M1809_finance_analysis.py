@@ -5,7 +5,7 @@
 日期：2018-5-28
 描述：
 1、初步调试机器学习方法
-
+2、参数设置，1的准确率增加
 版本号：V0.1
 '''
 
@@ -57,6 +57,8 @@ print(drop_columns)
 
 
 target = data['label']
+code = data['code']
+name = data['name']
 features = data.drop(['code','name','label'],axis=1)
 
 features[features.currentratio20161 == '--'] = 0
@@ -113,6 +115,8 @@ features_new = min_max_scaler.fit_transform(features)
 features = pd.DataFrame(features_new, columns=features.columns)
 
 
+features = features[['roe20181' ,'esp20181' ,'esp20174' ,'roe20174' ,'net_profits20174' ,'net_profits20181' ,'esp20173' ,'net_profits20172' ,'roe20173' ,'net_profits20173' ,'net_profits20163' ,'esp20172' ,'business_income20174' ,'roe20172' ,'net_profits20171' ,'net_profits20164' ,'rateofreturn20173' ,'seg20181' ,'net_profits20162' ,'business_income20173' ,'roe20171' ,'business_income20171' ,'nprg20181' ,'business_income20181' ,'nav20181' ,'rateofreturn20174' ,'epsg20181' ,'seg20174' ,'business_income20172' ,'esp20171']]
+
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_blobs
 from sklearn.ensemble import RandomForestClassifier
@@ -127,7 +131,8 @@ features,target,test_size=0.25,random_state=42)
 '''
 Random_forset 
 '''
-clf = RandomForestClassifier(n_estimators=50,max_depth = 5,min_samples_split = 30,min_samples_leaf = 20,random_state=2018,class_weight="balanced")
+clf = RandomForestClassifier(n_estimators=200,max_depth = 7,min_samples_split = 5,min_samples_leaf = 20,random_state=2018,class_weight={1:1.5})
+
 clf = clf.fit(X_train, y_train)
 y_pre = clf.predict(X_test)
 
@@ -163,4 +168,11 @@ for f in range(features.shape[1]):
 
 
 
+y_pre_pro_f = clf.predict_proba(features)[:, 1]
 
+y_pre_pro_f = pd.DataFrame({'code' : code,
+                            'name' : name,
+                   'gailv' : y_pre_pro_f
+                   })
+    
+y_pre_pro_f.to_csv('D:/999github/anack/M1809/y_pre_pro_f.csv',index =False)
