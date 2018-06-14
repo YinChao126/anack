@@ -10,11 +10,8 @@
 方法：使用TUSHARE
 版本号：V0.1
 '''
-
 import pandas as pd
 import tushare as ts
-
-
 '''
 盈利能力表
 
@@ -29,7 +26,6 @@ business_income,营业收入(百万元)
 bips,每股主营业务收入(元)
 season,年+季度
 '''
-
 result_yinli = ts.get_profit_data(2018,1).loc[:,['code','name']]
 print(result_yinli)
 for i in [2016,2017,2018]:
@@ -51,9 +47,6 @@ for i in [2016,2017,2018]:
         print(len(result_yinli))
 result_yinli = result_yinli.drop_duplicates()        
 result_yinli.to_csv('D:/999github/anack/M1809/result_yinli.csv',index =False)
-
-
-
 '''
 营运能力表
 
@@ -67,7 +60,6 @@ currentasset_turnover,流动资产周转率(次)
 currentasset_days,流动资产周转天数(天)
 season,年+季度
 '''
-
 result_yingyun = ts.get_operation_data(2018,1).loc[:,['code','name']]
 for i in [2016,2017,2018]:
     if i != 2018:
@@ -82,13 +74,8 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_operation_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_yingyun = pd.merge(result_yingyun, result_1, on='code',how='left')
-result_yingyun = result_yinli.drop_duplicates()
+result_yingyun = result_yingyun.drop_duplicates()
 result_yingyun.to_csv('D:/999github/anack/M1809/result_yingyun.csv',index =False)
-        
-        
-        
-        
-        
 '''
 成长能力表
 
@@ -102,7 +89,6 @@ epsg,每股收益增长率
 seg,股东权益增长率
 season,年+季度
 '''
-
 result_chengzhang = ts.get_growth_data(2018,1).loc[:,['code','name']]
 for i in [2016,2017,2018]:
     if i != 2018:
@@ -117,14 +103,8 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_growth_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_chengzhang = pd.merge(result_chengzhang, result_1, on='code',how='left')
-result_chengzhang = result_yinli.drop_duplicates()
+result_chengzhang = result_chengzhang.drop_duplicates()
 result_chengzhang.to_csv('D:/999github/anack/M1809/result_chengzhang.csv',index =False)
-        
-        
-        
-        
-        
-        
 '''
 偿债能力表
 
@@ -138,7 +118,6 @@ sheqratio,股东权益比率
 adratio,股东权益增长率
 season,年+季度
 '''
-
 result_changzhai = ts.get_debtpaying_data(2018,1).loc[:,['code','name']]
 for i in [2016,2017,2018]:
     if i != 2018:
@@ -153,15 +132,8 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_debtpaying_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_changzhai = pd.merge(result_changzhai, result_1, on='code',how='left')
-result_changzhai = result_yinli.drop_duplicates()
+result_changzhai = result_changzhai.drop_duplicates()
 result_changzhai.to_csv('D:/999github/anack/M1809/result_changzhai.csv',index =False)
-
-
-
-
-
-
-
 '''
 现金流量表
 
@@ -174,7 +146,6 @@ cf_liabilities,经营现金净流量对负债比率
 cashflowratio,现金流量比率
 season,年+季度
 '''
-
 result_xianjin = ts.get_cashflow_data(2018,1).loc[:,['code','name']]
 for i in [2016,2017,2018]:
     if i != 2018:
@@ -189,6 +160,6 @@ for i in [2016,2017,2018]:
         result_1 = pd.DataFrame(ts.get_cashflow_data(i,j).values,columns = columns)
         result_1 = result_1.drop(['name'],axis=1)
         result_xianjin = pd.merge(result_xianjin, result_1, on='code',how='left')
-result_xianjin = result_yinli.drop_duplicates()
+result_xianjin = result_xianjin.drop_duplicates()
 result_xianjin.to_csv('D:/999github/anack/M1809/result_xianjin.csv',index =False)
 
