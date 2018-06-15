@@ -38,11 +38,14 @@ def M1809_config():
     
     
     for s in ct:
-        if s.strip() != '': 
-            parameter.append(s.strip())
+        items = s.strip()
+        if items != '': 
+            if items[0] == '#': #剔除注释部分
+                break
+            parameter.append(items)
     
     del id_list[:]
-    with open('company_list.txt','r') as fh:
+    with open('company_list.txt','r', encoding = 'utf-8') as fh:
         ct = fh.readlines()
     company = []
     for s in ct:
@@ -79,4 +82,4 @@ def M1809_Update():
 
 #############################################################################
 if __name__ =='__main__':
-    a = M1809_config()
+    para,list_id = M1809_config()
