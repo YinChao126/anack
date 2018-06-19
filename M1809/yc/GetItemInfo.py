@@ -82,7 +82,7 @@ def GetSingleItem(para, stock_id, year):
     info[5] = float(data1[4].replace(',',''))  #应收账款
     info[6] = float(data1[42].replace(',',''))  #预收账款
     info[7] = float(data1[10].replace(',',''))  #存货
-    CurrentLiabilities = float(data1[54].replace(',',''))  #预收账款
+    CurrentLiabilities = float(data1[54].replace(',',''))  #流动负载
     
      #去年的资产负载表
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'2016-12-31\';"
@@ -109,7 +109,7 @@ def GetSingleItem(para, stock_id, year):
     info[13] = float(data2[19].replace(',',''))  #净利润
     
     #非经常性盈利损失（此处只计算了前4项，会对计算除非净利润带来不准确）
-    NonRecurringProfitAndLoss = info[13] - NonbusinessExpenditure + IncomeFromInvestment - LossFromAssetDevaluation
+    NonRecurringProfitAndLoss = info[12] - NonbusinessExpenditure + IncomeFromInvestment - LossFromAssetDevaluation
     #除非净利润=净利润-非经常性盈利损失
     info[14] = info[13] - NonRecurringProfitAndLoss  #除非净利润
     info[15] = float(data2[22].replace(',',''))  #每股收益
@@ -146,13 +146,13 @@ def GetSingleItem(para, stock_id, year):
     #指标计算，可能还需要获取额外的数据如实时股价等。。。
     
     #流动比率＝流动资产（3）/流动负债（h55）x100%
-    info[22] = info[3] * 100 / CurrentLiabilities #流动比率
-    
+   
+    info[22] = round((info[3]/CurrentLiabilities),2) #流动比率
     #资金周转率=本期销售收入净额（营业收入）*2/（资产总额期初余额+资产总额期末余额），期末期初按一年计算
-    info[22] = info[8] * 2 / (info[0] + AssetLastYear)
+    info[23] = info[8] * 2 / (info[0] + AssetLastYear)
     
     #存货周转率 = 营业成本 / 平均存货 ，平均存货=（期初存贷余额+期末存贷余额)/2,按一年期进行计算
-    info[23] = info[9] * 2 / (info[7] + InventoryLastYear)
+    info[24] = info[9] * 2 / (info[7] + InventoryLastYear)
     
     #tushare实时数据
     '''
@@ -161,30 +161,32 @@ def GetSingleItem(para, stock_id, year):
     mktcap:总市值
     nmc:流通市值
     '''
-    DataTushare =  (ts.get_today_all().values)[0]
+    DataT =  (ts.get_today_all().values)[0]
+    DataTushare=DataT[DataT['code']=='600660'].values
     per = DataTushare[11]
     pb = DataTushare[12]
     mktcap = DataTushare[13]
-    info[24] =  mktcap / info[1] #总市值/净资
-    info[25] =  per #市盈率
-    info[26] = pb #市净率
+    info[25] =  mktcap / info[1] #总市值/净资
+    info[26] =  per #市盈率
+    info[27] = pb #市净率
     
     #真实净资产收益率 = 净利润 * 2 / (本年期初净资产+本年期末净资产)
     NetAssetEnd = info[0] - debt
     NetAssetBegin = float(data1_last[37].replace(',','')) - float(data1_last[65].replace(',',''))
-    info[28] = info[13] * 2 / (NetAssetEnd + NetAssetBegin)
+    info[29] = info[13] * 2 / (NetAssetEnd + NetAssetBegin)
     #名义净资产收益率 = 真实净资产收益率 * 市净率
-    info[27] = info[28] * pb
+    info[28] = info[28] * pb
     
-    #毛利率 = （营业收入 - 营业成本） / 营业成本 * 100%
-    info[29] = (info[8] - info[9]) * 100 / info[9]
+    #毛利率 = （营业收入 - 营业成本） / 营业成本 
+    info[30] = round((info[8] - info[9]) / info[9],2)
     
-    #营收增长率 = (本年度营业收入 - 上年度营业收入) /上年度营业收入 *100%
-    info[30] = (info[8] - RevenueLast) * 100 / RevenueLast
+    #营收增长率 = (本年度营业收入 - 上年度营业收入) /上年度营业收入 
+    info[31] = round((info[8] - RevenueLast)/ RevenueLast,2)
     
-    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
-    info[31] = (info[14] - NullNetProfit) * 100 / NullNetProfit
+    #除非净利润增长率 = (年末 - 年初)/ 年初
+    info[32] = round((info[14] - NullNetProfit)/ NullNetProfit,2)
     
+    print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
 
