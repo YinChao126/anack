@@ -109,7 +109,7 @@ def GetSingleItem(para, stock_id, year):
     info[13] = float(data2[19].replace(',',''))  #净利润
     
     #非经常性盈利损失（此处只计算了前4项，会对计算除非净利润带来不准确）
-    NonRecurringProfitAndLoss = info[12] + NonbusinessExpenditure + IncomeFromInvestment + LossFromAssetDevaluation
+    NonRecurringProfitAndLoss = info[13] - NonbusinessExpenditure + IncomeFromInvestment - LossFromAssetDevaluation
     #除非净利润=净利润-非经常性盈利损失
     info[14] = info[13] - NonRecurringProfitAndLoss  #除非净利润
     info[15] = float(data2[22].replace(',',''))  #每股收益
@@ -124,7 +124,7 @@ def GetSingleItem(para, stock_id, year):
     IncomeFromInvestmentLast = float(data2_last[10].replace(',','')) #投资收益
     NonbusinessExpenditureLast = float(data2_last[15].replace(',',''))  #营业外支出
     LossFromAssetDevaluationLast = float(data2_last[8].replace(',',''))  #资产减值损失
-    NonRecurringProfitAndLossLast = NonbusinessIncomeLast + IncomeFromInvestmentLast + NonbusinessExpenditureLast + LossFromAssetDevaluationLast
+    NonRecurringProfitAndLossLast = NonbusinessIncomeLast + IncomeFromInvestmentLast - NonbusinessExpenditureLast - LossFromAssetDevaluationLast
     NetProfit = float(data2_last[19].replace(',',''))  #净利润
     NullNetProfit = NetProfit - NonRecurringProfitAndLossLast
     
@@ -191,5 +191,6 @@ def GetSingleItem(para, stock_id, year):
 ###############################################################################
 if __name__ =='__main__':
     parameter,company_id = Config.M1809_config() #获取配置信息
-    s = GetSingleItem(parameter,company_id[0],2017)
+    #s = GetSingleItem(parameter,company_id[0],2017)
+    s = GetSingleItem(parameter,'600660',2017)
     print(s)
