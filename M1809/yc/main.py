@@ -55,19 +55,19 @@ def Compare2Themself(target_id, start_year = 2010):
     plt.ylabel('') #纵坐标标签
     plt.title('营运情况')
     
-    Pictrue1 = result.iloc[:,[22,23,24]]
+    Pictrue1 = result.iloc[:,[16,19,20]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
     plt.ylabel('') #纵坐标标签
     plt.title('现金情况')
     
-    Pictrue1 = result.iloc[:,[22,23,24]]
+    Pictrue1 = result.iloc[:,[12,11]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
     plt.ylabel('') #纵坐标标签
     plt.title('盈利质量')
     
-    Pictrue1 = result.iloc[:,[22,23,24]]
+    Pictrue1 = result.iloc[:,[26,30,31]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
     plt.ylabel('') #纵坐标标签
@@ -122,13 +122,13 @@ def PlotAnalyse(data):
     plt.ylabel('') #纵坐标标签
     plt.title('营运情况')
     
-    Pictrue1 = data.iloc[:,[22,23,24]]
+    Pictrue1 = data.iloc[:,[16,19,20]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
     plt.ylabel('') #纵坐标标签
     plt.title('现金情况')
     
-    Pictrue1 = data.iloc[:,[22,23,24]]
+    Pictrue1 = data.iloc[:,[12,9,11]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
     plt.ylabel('') #纵坐标标签
@@ -147,8 +147,9 @@ def PlotAnalyse(data):
 if __name__ =='__main__':
     # 1. 初始化配置
     parameter,company = Config.M1809_config() #获取配置信息 
-    a = Compare2Themself(company[0])
-#    b = Compare2Industry(company)
-#    b.to_csv('compare_industry.csv')
+    a = Compare2Themself('000651')
+    
+    b = Compare2Industry(company)
+    b.to_csv('compare_industry.csv')
     
 #    PlotAnalyse(a)
