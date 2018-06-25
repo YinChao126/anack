@@ -113,7 +113,7 @@ def GetSingleItem(para, stock_id, year):
     data2 = result #获得资产负债表信息
 #    print(data)
     info[8] = float(data2[0].replace(',',''))  #营业收入
-    info[9] = float(data2[3].replace(',',''))  #营业成本
+    info[9] = float(data2[2].replace(',',''))  #营业总成本
     info[10] = float(data2[4].replace(',',''))  #营业税金及附加
     info[11] = float(data2[7].replace(',',''))  #财务费用
     LossFromAssetDevaluation = float(data2[8].replace(',',''))  #资产减值损失
@@ -227,7 +227,7 @@ def GetSingleItem(para, stock_id, year):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
-    print(pd.Series(info,index = para))
+    #print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
 
