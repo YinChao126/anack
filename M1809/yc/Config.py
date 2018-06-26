@@ -9,10 +9,10 @@ import crawling_finance_table
 import pymysql
 def Connect_sql():
     conn = pymysql.connect(
-            host = ' ',
+            host = '',
             port = 3306,
-            user = ' ',
-            passwd = ' ',
+            user = '',
+            passwd = '',
             db = "test",
             charset = "utf8"
             )
@@ -20,6 +20,23 @@ def Connect_sql():
     cur = conn.cursor()
     print("\nconnect to aliyun success!\n")
     return cur
+
+
+def Connect_sql_root():
+    conn = pymysql.connect(
+            host = '',
+            port = 3306,
+            user = 'root',
+            passwd = '',
+            db = "",
+            charset = "utf8"
+            )
+    
+    cur = conn.cursor()
+    print("\nconnect to aliyun success!\n")
+    return cur
+
+
 
 
 parameter = []

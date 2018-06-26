@@ -14,7 +14,6 @@ import urllib.request
 import numpy as np
 np.set_printoptions(suppress=True)
 import Config
-import trade_day
 
 
 '''
@@ -95,10 +94,7 @@ def GetSingleItem(para, stock_id, year):
     CurrentLiabilities = float(data1[54].replace(',',''))  #流动负载
     
      #去年的资产负载表
-    cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year-1)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
-    data1_last = result[0] #获得去年年末资产负债表信息
+    data1_last = result #获得去年年末资产负债表信息
     AssetLastYear = float(data1_last[37].replace(',','')) #总资产
     InventoryLastYear = float(data1_last[10].replace(',',''))  #去年存货
     
@@ -114,7 +110,7 @@ def GetSingleItem(para, stock_id, year):
     data2 = result #获得资产负债表信息
 #    print(data)
     info[8] = float(data2[0].replace(',',''))  #营业收入
-    info[9] = float(data2[2].replace(',',''))  #营业总成本
+    info[9] = float(data2[2].replace(',',''))  #营业成本
     info[10] = float(data2[4].replace(',',''))  #营业税金及附加
     info[11] = float(data2[7].replace(',',''))  #财务费用
     LossFromAssetDevaluation = float(data2[8].replace(',',''))  #资产减值损失
@@ -124,7 +120,7 @@ def GetSingleItem(para, stock_id, year):
     info[13] = float(data2[19].replace(',',''))  #净利润
     
     #非经常性盈利损失（此处只计算了前4项，会对计算除非净利润带来不准确）
-    NonRecurringProfitAndLoss = info[12] - NonbusinessExpenditure + IncomeFromInvestment - LossFromAssetDevaluation
+    NonRecurringProfitAndLoss = NonbusinessExpenditure + IncomeFromInvestment + LossFromAssetDevaluation
     #除非净利润=净利润-非经常性盈利损失
     info[14] = info[13] - NonRecurringProfitAndLoss  #除非净利润
     info[15] = float(data2[22].replace(',',''))  #每股收益
@@ -168,7 +164,7 @@ def GetSingleItem(para, stock_id, year):
     #流动比率＝流动资产（3）/流动负债（h55）x100%
     info[22] = round(info[3] / CurrentLiabilities,2) #流动比率
    
-
+    info[22] = round((info[3]/CurrentLiabilities),2) #流动比率
     #资金周转率=本期销售收入净额（营业收入）*2/（资产总额期初余额+资产总额期末余额），期末期初按一年计算
     info[23] = round(info[8] * 2 / (info[0] + AssetLastYear),2)
     
@@ -182,32 +178,24 @@ def GetSingleItem(para, stock_id, year):
     mktcap:总市值
     nmc:流通市值
     '''
-
+        
+    base = 'http://hq.sinajs.cn/list='
     flag = int(stock_id)
     if flag >= 600000:
         bios = 'sh' + stock_id
     else:
         bios = 'sz' + stock_id
-    bios = '\''+bios+'\''
-    cur_new = Config.Connect_sql_root()
-    date =31
-    month=12
-    cmd_base = "select * from k_day where code ="+bios+" and date= "
-    while(date>10):
-        DateStr=str(year)+str(month)+str(date)
-        IsTradeDay=trade_day.is_tradeday(DateStr)
-        if(IsTradeDay):
-#            print(DateStr)
-            break
-        date=date-1
-    day= '\''+str(year)+'-12-'+str(date)+'\''+';'
-    cmd_new=cmd_base+day
-    cur_new.execute(cmd_new)
-    result = cur_new.fetchall()
-    cur_price=float(result[0][5])
-#    print (cur_price)
-#    print (date)
-
+    inputstr = base + bios
+    page = urllib.request.urlopen(inputstr).read()
+    if len(page) < 30:
+        print('error, invalid id')
+    s = page[30:]
+    s = str(s)
+    
+    pattern_data = '\d+\.*\d*(?=,)'
+    reobj = re.compile(pattern_data)
+    data = reobj.findall(s)
+    cur_price = float(data[2])
     info[25] = round(cur_price * stock_num / info[0],2)
     info[26] = round(cur_price / info[15],2) #静态市盈率
     info[27] = round(info[1] / stock_num,2) #市净率
@@ -223,9 +211,9 @@ def GetSingleItem(para, stock_id, year):
     #真实净资产收益率 = 净利润 * 2 / (本年期初净资产+本年期末净资产)
     NetAssetEnd = info[0] - debt
     NetAssetBegin = float(data1_last[37].replace(',','')) - float(data1_last[65].replace(',',''))
-    info[29] = round(info[13] * 2 / (NetAssetEnd + NetAssetBegin),2)
+    info[28] = round(info[13] * 2 / (NetAssetEnd + NetAssetBegin),2)
     #名义净资产收益率 = 真实净资产收益率 * 市净率
-    info[28] = round(info[29] * info[27],2)
+#    info[29] = round(info[28] * pb,2)
     
 #    #毛利率 = （营业收入 - 营业成本） / 营业成本 * 100%
     info[30] = round((info[8] - info[9]) / info[9],2)
@@ -236,7 +224,7 @@ def GetSingleItem(para, stock_id, year):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
-    #print(pd.Series(info,index = para))
+    print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
 
@@ -244,5 +232,5 @@ def GetSingleItem(para, stock_id, year):
 if __name__ =='__main__':
     parameter,company_id = Config.M1809_config() #获取配置信息
     #s = GetSingleItem(parameter,company_id[0],2017)
-    s = GetSingleItem(parameter,'600660',2017)
+    s = GetSingleItem(parameter,'601012',2017)
     print(s)
