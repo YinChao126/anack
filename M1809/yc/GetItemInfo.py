@@ -14,6 +14,7 @@ import urllib.request
 import numpy as np
 np.set_printoptions(suppress=True)
 import Config
+import trade_day
 
 
 '''
@@ -181,24 +182,32 @@ def GetSingleItem(para, stock_id, year):
     mktcap:总市值
     nmc:流通市值
     '''
-        
-    base = 'http://hq.sinajs.cn/list='
+
     flag = int(stock_id)
     if flag >= 600000:
         bios = 'sh' + stock_id
     else:
         bios = 'sz' + stock_id
-    inputstr = base + bios
-    page = urllib.request.urlopen(inputstr).read()
-    if len(page) < 30:
-        print('error, invalid id')
-    s = page[30:]
-    s = str(s)
-    
-    pattern_data = '\d+\.*\d*(?=,)'
-    reobj = re.compile(pattern_data)
-    data = reobj.findall(s)
-    cur_price = float(data[2])
+    bios = '\''+bios+'\''
+    cur_new = Config.Connect_sql_root()
+    date =31
+    month=12
+    cmd_base = "select * from k_day where code ="+bios+" and date= "
+    while(date>10):
+        DateStr=str(year)+str(month)+str(date)
+        IsTradeDay=trade_day.is_tradeday(DateStr)
+        if(IsTradeDay):
+#            print(DateStr)
+            break
+        date=date-1
+    day= '\''+str(year)+'-12-'+str(date)+'\''+';'
+    cmd_new=cmd_base+day
+    cur_new.execute(cmd_new)
+    result = cur_new.fetchall()
+    cur_price=float(result[0][5])
+#    print (cur_price)
+#    print (date)
+
     info[25] = round(cur_price * stock_num / info[0],2)
     info[26] = round(cur_price / info[15],2) #静态市盈率
     info[27] = round(info[1] / stock_num,2) #市净率
