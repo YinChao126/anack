@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Thu Jun 14 01:44:29 2018
 
@@ -226,10 +226,7 @@ def GetSingleItem(para, stock_id, year):
     day= str(year)+'12'+str(date)
     
     price=gpc.get_close_price(stock_id,day)
-    cur_price=(float)(price)
-
-    
-    
+    cur_price=round((float)(price),2)    
 #    print (cur_price)
 #    print (date)
 
@@ -268,6 +265,5 @@ def GetSingleItem(para, stock_id, year):
 ###############################################################################
 if __name__ =='__main__':
     parameter,company_id = Config.M1809_config() #获取配置信息
-    #s = GetSingleItem(parameter,company_id[0],2017)
-    s = GetSingleItem(parameter,'600660',2017)
+    s = GetSingleItem(parameter,'002129',2017)
     print(s)

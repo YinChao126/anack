@@ -421,9 +421,9 @@ if __name__ =='__main__':
     # 1. 初始化配置
     parameter,company = Config.M1809_config() #获取配置信息 
     a = Compare2Themself('601012')
-#    a.to_csv('compare_self.csv')
+    a.to_csv('compare_self.csv', encoding = 'gbk')
     b = Compare2Industry(company)
-#    b.to_csv('compare_industry.csv')
+    b.to_csv('compare_industry.csv', encoding = 'gbk')
     Analyse(a,b)
     
     
