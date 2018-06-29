@@ -1,0 +1,7 @@
+*.bin
+debug/
+data/
+__pycache__/
+*.pyc
+*.cpython-36.pyc
+output/

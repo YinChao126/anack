@@ -34,7 +34,7 @@ def get_close_price(id, day = 0):
         pattern = '[^,\r\n]+'
         obj = re.compile(pattern)
         match = obj.findall(chunk.decode('gbk'))
-        print(match)
+        #print(match)
         if len(match) < 8:
             return 0
         else:
