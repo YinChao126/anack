@@ -7,6 +7,11 @@ Created on Thu Jun 14 01:44:29 2018
 
  
 # 远程数据库访问
+import sys
+sys.path.append('../..')
+import raw_modules.get_price as gpc
+
+
 import pandas as pd
 import tushare as ts
 import re
@@ -15,6 +20,8 @@ import numpy as np
 np.set_printoptions(suppress=True)
 import Config
 import trade_day
+
+
 
 
 '''
@@ -183,16 +190,32 @@ def GetSingleItem(para, stock_id, year):
     nmc:流通市值
     '''
 
-    flag = int(stock_id)
-    if flag >= 600000:
-        bios = 'sh' + stock_id
-    else:
-        bios = 'sz' + stock_id
-    bios = '\''+bios+'\''
-    cur_new = Config.Connect_sql_root()
+#    flag = int(stock_id)
+#    if flag >= 600000:
+#        bios = 'sh' + stock_id
+#    else:
+#        bios = 'sz' + stock_id
+#    bios = '\''+bios+'\''
+#    cur_new = Config.Connect_sql_root()
+#    date =31
+#    month=12
+#    cmd_base = "select * from k_day where code ="+bios+" and date= "
+#    while(date>10):
+#        DateStr=str(year)+str(month)+str(date)
+#        IsTradeDay=trade_day.is_tradeday(DateStr)
+#        if(IsTradeDay):
+##            print(DateStr)
+#            break
+#        date=date-1
+#    day= '\''+str(year)+'-12-'+str(date)+'\''+';'
+#    cmd_new=cmd_base+day
+#    cur_new.execute(cmd_new)
+#    result = cur_new.fetchall()
+#    cur_price=float(result[0][5])
+    
+
     date =31
     month=12
-    cmd_base = "select * from k_day where code ="+bios+" and date= "
     while(date>10):
         DateStr=str(year)+str(month)+str(date)
         IsTradeDay=trade_day.is_tradeday(DateStr)
@@ -200,11 +223,13 @@ def GetSingleItem(para, stock_id, year):
 #            print(DateStr)
             break
         date=date-1
-    day= '\''+str(year)+'-12-'+str(date)+'\''+';'
-    cmd_new=cmd_base+day
-    cur_new.execute(cmd_new)
-    result = cur_new.fetchall()
-    cur_price=float(result[0][5])
+    day= str(year)+'12'+str(date)
+    
+    price=gpc.get_close_price(stock_id,day)
+    cur_price=(float)(price)
+
+    
+    
 #    print (cur_price)
 #    print (date)
 
