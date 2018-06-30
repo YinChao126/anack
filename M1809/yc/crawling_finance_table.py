@@ -79,12 +79,18 @@ class crawling_finance:
     
     def __init__(self,work_path, stock_code,column_interest):
     
+        try:
+            with open('./config/account.txt', 'r') as fh:
+                account = fh.readlines()
+        except:
+            print('fail to initialize.')
+            return
         self.work_path = work_path
         self.stock_code = stock_code
-        self.hosts = '47.98.216.118'
-        self.users = 'yc'
-        self.passwords = 'Ycanack123!'
-        self.databases = 'test'
+        self.hosts = account[0].strip()
+        self.users = account[1].strip()
+        self.passwords = account[2].strip()
+        self.databases = account[3].strip()
         self.column_interest = column_interest
     def get_one_page(self,url):
         headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36'}

@@ -7,6 +7,7 @@ Created on Thu Jun 14 00:26:21 2018
 import pandas as pd
 from datetime import datetime
 import time
+import os
 
 import matplotlib.pyplot as plt
 #from pylab import *  
@@ -407,6 +408,10 @@ def Analyse(self_data, total_data):
     '''
     s = time.strftime("_%Y%m%d")
     s1 = time.strftime("%Y-%m-%d")
+    try:
+        os.mkdir('.//output')
+    except:
+        pass
     file_name = 'output/' + '诊断报告_' + company[0] + s + '.txt'
     with open(file_name, 'w') as fh:
         fh.write('版本号：V1.0\n')
@@ -419,12 +424,13 @@ def Analyse(self_data, total_data):
 ###############################################################################
 if __name__ =='__main__':
     # 1. 初始化配置
-    parameter,company = Config.M1809_config() #获取配置信息 
+    t_cur, parameter,company = Config.M1809_config() #获取配置信息 
+    GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
     a = Compare2Themself('601012')
-#    a.to_csv('compare_self.csv')
+    a.to_csv('./output/compare_self.csv', encoding = 'gbk')
     b = Compare2Industry(company)
-#    b.to_csv('compare_industry.csv')
+    b.to_csv('./output/compare_industry.csv', encoding = 'gbk')
     Analyse(a,b)
     
     
-#    PlotAnalyse(a)
+    PlotAnalyse(a)

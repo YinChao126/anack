@@ -7,13 +7,13 @@ Created on Thu Jun 14 01:47:40 2018
 
 import crawling_finance_table
 import pymysql
-def Connect_sql():
+def Connect_sql(account):
     conn = pymysql.connect(
-            host = '',
+            host = account[0].strip(),
             port = 3306,
-            user = '',
-            passwd = '',
-            db = "",
+            user = account[1].strip(),
+            passwd = account[2].strip(),
+            db = account[3].strip(),
             charset = "utf8"
             )
     
@@ -36,7 +36,7 @@ def M1809_config():
     注意：文件名不可改
     '''
     del parameter[:]
-    with open ('parameter_list.txt','r',encoding = 'utf-8') as fh:
+    with open ('./config/parameter_list.txt','r',encoding = 'utf-8') as fh:
         ct = fh.readlines()
     
     
@@ -48,14 +48,19 @@ def M1809_config():
             parameter.append(items)
     
     del id_list[:]
-    with open('company_list.txt','r', encoding = 'utf-8') as fh:
+    with open('./config/company_list.txt','r', encoding = 'utf-8') as fh:
         ct = fh.readlines()
     company = []
     for s in ct:
         if s.strip() != '': 
             company.append(s.strip())
-    
-    cur = Connect_sql()
+    try:
+        with open('./config/account.txt', 'r') as fh:
+            account = fh.readlines()
+    except:
+        print('fail to initialize.')
+        return
+    cur = Connect_sql(account)
     for name in company:
         cmd = "select * from anack_classify where name = \'"+name+"\';"
         cur.execute(cmd)
@@ -67,7 +72,7 @@ def M1809_config():
         except:
             print(name+' is not in list')
             pass    
-    return parameter, id_list
+    return cur, parameter, id_list
 
 def M1809_Update():
     '''
@@ -85,4 +90,4 @@ def M1809_Update():
 
 #############################################################################
 if __name__ =='__main__':
-    para,list_id = M1809_config()
+    cur, para,list_id = M1809_config()

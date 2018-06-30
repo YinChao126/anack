@@ -6,3 +6,5 @@ __pycache__/
 *.cpython-36.pyc
 output/
 *.csv
+*.cfg
+config/

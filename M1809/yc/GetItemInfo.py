@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Thu Jun 14 01:44:29 2018
 
@@ -12,6 +12,7 @@ sys.path.append('../..')
 import raw_modules.get_price as gpc
 
 
+from datetime import datetime, timedelta
 import pandas as pd
 import tushare as ts
 import re
@@ -22,8 +23,8 @@ import Config
 import trade_day
 
 
-
-
+global cur
+cur = 0
 '''
 list 对照表
 0   总资产
@@ -70,14 +71,13 @@ def GetSingleItem(para, stock_id, year):
     '''
     
     #
+    global cur
     p_len = len(para) #自动计算参数列表长度
     info = []   #实际待填充的字段，最后用于生成Series的value部分
   
     for s in range(p_len):
         info.append(-1) #初始化为-1，代表还未填充
-        
-    cur = Config.Connect_sql()
-    
+            
     #资产负债表中查询与填充
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
     cur.execute(cmd)
@@ -214,21 +214,18 @@ def GetSingleItem(para, stock_id, year):
 #    cur_price=float(result[0][5])
     
 
-    date =31
-    month=12
-    while(date>10):
-        DateStr=str(year)+str(month)+str(date)
-        IsTradeDay=trade_day.is_tradeday(DateStr)
-        if(IsTradeDay):
-#            print(DateStr)
-            break
-        date=date-1
-    day= str(year)+'12'+str(date)
-    
-    price=gpc.get_close_price(stock_id,day)
-    cur_price=(float)(price)
-
-    
+    DatStr = datetime(year,12,31)
+    cnt = 30 
+    while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
+        day = DatStr.strftime('%Y%m%d')
+        if trade_day.is_tradeday(day):
+            cur_price= float(gpc.get_close_price(stock_id,day))
+            if cur_price > 0.1:
+#                print(day)
+#                print(cur_price)
+                break
+        DatStr -= timedelta(1)
+        cnt -= 1  
     
 #    print (cur_price)
 #    print (date)
@@ -264,10 +261,13 @@ def GetSingleItem(para, stock_id, year):
     #print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
+def SetCur(cloud_cur):
+    global cur
+    cur = cloud_cur
 
 ###############################################################################
 if __name__ =='__main__':
-    parameter,company_id = Config.M1809_config() #获取配置信息
-    #s = GetSingleItem(parameter,company_id[0],2017)
-    s = GetSingleItem(parameter,'600660',2017)
-    print(s)
+    cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
+    cur = cur_t
+    s = GetSingleItem(parameter,'601012',2017)
+#    print(s)
