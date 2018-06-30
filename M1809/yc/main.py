@@ -7,7 +7,6 @@ Created on Thu Jun 14 00:26:21 2018
 import pandas as pd
 from datetime import datetime
 import time
-import os
 
 import matplotlib.pyplot as plt
 #from pylab import *  
@@ -408,10 +407,6 @@ def Analyse(self_data, total_data):
     '''
     s = time.strftime("_%Y%m%d")
     s1 = time.strftime("%Y-%m-%d")
-    try:
-        os.mkdir('.//output')
-    except:
-        pass
     file_name = 'output/' + '诊断报告_' + company[0] + s + '.txt'
     with open(file_name, 'w') as fh:
         fh.write('版本号：V1.0\n')

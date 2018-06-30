@@ -7,6 +7,7 @@ Created on Thu Jun 14 01:47:40 2018
 
 import crawling_finance_table
 import pymysql
+import os
 def Connect_sql(account):
     conn = pymysql.connect(
             host = account[0].strip(),
@@ -71,7 +72,11 @@ def M1809_config():
             
         except:
             print(name+' is not in list')
-            pass    
+            pass   
+    try:
+        os.mkdir('.//output')
+    except:
+        pass 
     return cur, parameter, id_list
 
 def M1809_Update():
