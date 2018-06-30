@@ -12,6 +12,7 @@ sys.path.append('../..')
 import raw_modules.get_price as gpc
 
 
+from datetime import datetime, timedelta
 import pandas as pd
 import tushare as ts
 import re
@@ -214,19 +215,19 @@ def GetSingleItem(para, stock_id, year):
 #    cur_price=float(result[0][5])
     
 
-    date =31
-    month=12
-    while(date>10):
-        DateStr=str(year)+str(month)+str(date)
-        IsTradeDay=trade_day.is_tradeday(DateStr)
-        if(IsTradeDay):
-#            print(DateStr)
-            break
-        date=date-1
-    day= str(year)+'12'+str(date)
+    DatStr = datetime(year,12,31)
+    cnt = 30 
+    while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
+        day = DatStr.strftime('%Y%m%d')
+        if trade_day.is_tradeday(day):
+            cur_price= float(gpc.get_close_price(stock_id,day))
+            if cur_price > 0.1:
+#                print(day)
+#                print(cur_price)
+                break
+        DatStr -= timedelta(1)
+        cnt -= 1  
     
-    price=gpc.get_close_price(stock_id,day)
-    cur_price=round((float)(price),2)    
 #    print (cur_price)
 #    print (date)
 
@@ -265,5 +266,5 @@ def GetSingleItem(para, stock_id, year):
 ###############################################################################
 if __name__ =='__main__':
     parameter,company_id = Config.M1809_config() #获取配置信息
-    s = GetSingleItem(parameter,'002129',2017)
+    s = GetSingleItem(parameter,'601012',2011)
     print(s)
