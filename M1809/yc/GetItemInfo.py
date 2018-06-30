@@ -23,8 +23,8 @@ import Config
 import trade_day
 
 
-
-
+global cur
+cur = 0
 '''
 list 对照表
 0   总资产
@@ -71,14 +71,13 @@ def GetSingleItem(para, stock_id, year):
     '''
     
     #
+    global cur
     p_len = len(para) #自动计算参数列表长度
     info = []   #实际待填充的字段，最后用于生成Series的value部分
   
     for s in range(p_len):
         info.append(-1) #初始化为-1，代表还未填充
-        
-    cur = Config.Connect_sql()
-    
+            
     #资产负债表中查询与填充
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
     cur.execute(cmd)
@@ -262,9 +261,13 @@ def GetSingleItem(para, stock_id, year):
     #print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
+def SetCur(cloud_cur):
+    global cur
+    cur = cloud_cur
 
 ###############################################################################
 if __name__ =='__main__':
-    parameter,company_id = Config.M1809_config() #获取配置信息
-    s = GetSingleItem(parameter,'601012',2011)
-    print(s)
+    cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
+    cur = cur_t
+    s = GetSingleItem(parameter,'601012',2017)
+#    print(s)
