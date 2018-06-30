@@ -215,18 +215,20 @@ def GetSingleItem(para, stock_id, year):
     
 
     DatStr = datetime(year,12,31)
-    cnt = 30 
+    cnt = 60 
     while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
         day = DatStr.strftime('%Y%m%d')
         if trade_day.is_tradeday(day):
+            cnt -= 1  
             cur_price= float(gpc.get_close_price(stock_id,day))
             if cur_price > 0.1:
 #                print(day)
 #                print(cur_price)
                 break
         DatStr -= timedelta(1)
-        cnt -= 1  
-    
+    if cnt <= 0: #连续60个交易日无数据，说明该公司长期停牌
+        cur_price = 0
+        print('warning,',year, ',',stock_id,'has no data' )
 #    print (cur_price)
 #    print (date)
 
