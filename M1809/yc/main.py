@@ -15,7 +15,25 @@ import matplotlib.pyplot as plt
 import GetItemInfo
 import Config
 
+## API接口函数    
+def Analyse(self_data, total_data):
+    '''
+    API函数
+    直接根据配置信息，从云端获取数据，填充字段，输出原始csv文件，txt分析文件，绘图
+    '''
+    s = time.strftime("_%Y%m%d")
+    s1 = time.strftime("%Y-%m-%d")
+    file_name = 'output/' + '诊断报告_' + company[0] + s + '.txt'
+    with open(file_name, 'w') as fh:
+        fh.write('版本号：V1.0\n')
+        fh.write('诊断时间：'+ s1 +'\n')
+        fh.write('诊断个股：'+ '隆基股份-' + '601012' + '\n')
+        SelfAnalyse(fh, self_data)
+        CompareAnalyse(fh, total_data)
+        ComprehensiveResult(fh)
 
+## 以下均为辅助函数，用户不用关心
+###############################################################################
 def Compare2Themself(target_id, start_year = 2010):   
     '''
     个股连续多年的对比分析
@@ -32,53 +50,8 @@ def Compare2Themself(target_id, start_year = 2010):
         except:
             pass
     result = pd.DataFrame(result,index = index_id)
-#    result.to_csv('compare_self.csv')
-#    
-#    
-#    '''
-#    个股纵向对比绘图分析
-#    '''
-#    Pictrue1 = result.iloc[:,[0,1,3]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('元') #纵坐标标签
-#    plt.title('体量')
-#    
-#    Pictrue1 = result.iloc[:,[2]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('') #纵坐标标签
-#    plt.title('安全性检查')
-#    
-#    Pictrue1 = result.iloc[:,[22,23,24]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('') #纵坐标标签
-#    plt.title('营运情况')
-#    
-#    Pictrue1 = result.iloc[:,[16,19,20]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('') #纵坐标标签
-#    plt.title('现金情况')
-#    
-#    Pictrue1 = result.iloc[:,[12,11]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('') #纵坐标标签
-#    plt.title('盈利质量')
-#    
-#    Pictrue1 = result.iloc[:,[26,30,31]]
-#    Pictrue1.plot()
-#    plt.xlabel('年份')  #横坐标标签
-#    plt.ylabel('') #纵坐标标签
-#    plt.title('重要参数对比')
-#    plt.show()
     return result
 
-#绘图分析
-
-# 3. 同行业对比
 def Compare2Industry(company):
     '''
     同行业的对比分析
@@ -210,7 +183,6 @@ def FileOutAverage(fh, comment, avg, last):
     fh.write(comment + ':\t')
     fh.write(str(avg) + ',\t' + str(last) + '\n')
     
-    diff = last -avg
     
     #手工分析结果   
 def SelfAnalyse(fh, data, mode = 0):
@@ -306,87 +278,102 @@ def CompareItem(fh, comment, data, column, pole = 1):
     辅助函数：用于实现column字段的同行业对比，并直接输出到文档
     pole: 1->高于对比值为良好）  其他任意值->低于对比值为良好
     '''
-    fh.write(comment)
-    t = data.iloc[1][column]
-    c = data.iloc[2][column]
-    a = data.iloc[-1][column]
+    score = 5 #初始单项分数为5分
     
+    fh.write(comment)
+    t = data.iloc[0][column]
+    c = data.iloc[1][column]
+    a = data.iloc[-1][column]
     rate1 = round((t - c) / c,3)
     rate2 = round((t - a) / a,3)
     fh.write(str(rate1)+',\t'+str(rate2)+'\t')
     
     cnt = 0
     if pole == 1:
-        if rate1 > 0:
+        if rate1 > 0.01:
             fh.write(' ')
             cnt = cnt + 1
         else:
             fh.write('劣于竞争对手，')
             cnt = cnt - 1
-        if rate2 > 0:
+            score -= 2
+        if rate2 > 0.01:
             fh.write(' ')
             cnt = cnt + 1
         else:
             fh.write('劣于平均水平，')
             cnt = cnt - 1
+            score -= 3
     else:
-        if rate1 < 0:
+        if rate1 < 0.01:
             fh.write(' ')
             cnt = cnt + 1
         else:
             fh.write('劣于竞争对手，')
             cnt = cnt - 1
-        if rate2 < 0:
+            score -= 2
+        if rate2 < 0.01:
             fh.write(' ')
             cnt = cnt + 1
         else:
             fh.write('劣于平均水平.')
             cnt = cnt - 1
+            score -= 3
     if cnt < 0:
         fh.write('该指标异常，请格外注意！\n')
     else:
         fh.write('\n')
     
     
-    return data.iloc[1][column], data.iloc[2][column], data.iloc[-1][column]
+    return score
 
 def CompareAnalyse(fh, data, mode = 0):
     fh.write('\n--------------------------------------------\n')
-    fh.write('**同行业对比结果**\n')
+    fh.write('**同行业对比结果与评级输出**\n')
     fh.write('--------------------------------------------\n')
     fh.write('1.资产类对比\n')
-    CompareItem(fh, '总资产对比：', data, 1)
-    CompareItem(fh, '净资产对比：', data, 1)
-    CompareItem(fh, '资产负债比：', data, 2, 0)
-    CompareItem(fh, '应收款：', data, 5,0)
-    CompareItem(fh, '预收款：', data, 6)
-    CompareItem(fh, '存货：', data, 7)
+    score = 0 #初始分数100分
+    score += CompareItem(fh, '总资产对比：', data, 0)
+    score += CompareItem(fh, '净资产对比：', data, 1)
+    score += CompareItem(fh, '资产负债比：', data, 2, 0)
+    score += CompareItem(fh, '应收款：', data, 5,0)
+    score += CompareItem(fh, '预收款：', data, 6)
+    score += CompareItem(fh, '存货：', data, 7)
     
     fh.write('--------------------------------------------\n') 
     fh.write('2.经营类对比\n')
-    CompareItem(fh, '营收', data, 8)
-    CompareItem(fh, '营业外收入', data, 12, 0)
-    CompareItem(fh, '除非净利润：', data, 14)
+    score += CompareItem(fh, '营收', data, 8)
+    score += CompareItem(fh, '营业外收入', data, 12, 0)
+    score += CompareItem(fh, '除非净利润：', data, 14)
     
     fh.write('--------------------------------------------\n') 
     fh.write('3.现金流对比\n')
-    CompareItem(fh, '经营净额：', data, 16)
-    CompareItem(fh, '汇率影响：', data, 19, 0)
-    CompareItem(fh, '现金净增加额：', data, 20)
-    CompareItem(fh, '期末现金余额：', data, 21)
+    score += CompareItem(fh, '经营净额：', data, 16)
+    score += CompareItem(fh, '汇率影响：', data, 19, 0)
+    score += CompareItem(fh, '现金净增加额：', data, 20)
+    score += CompareItem(fh, '期末现金余额：', data, 21)
     
     fh.write('--------------------------------------------\n') 
     fh.write('4.营运质量对比\n')
-    CompareItem(fh, '流动比率：', data, 22)
-    CompareItem(fh, '资产周转率：', data, 23)
-    CompareItem(fh, '存货周转率：', data, 24)
+    score += CompareItem(fh, '流动比率：', data, 22)
+    score += CompareItem(fh, '资产周转率：', data, 23)
+    score += CompareItem(fh, '存货周转率：', data, 24)
+    #此处还要增加4个指标
+    #自动评级结论在此处输出
+    score += 20
+    print(score)
+    stra = '---->>|同行业对比得分：\t' + str(score) + '\t|<----\n'
+    fh.write(stra) 
+    fh.write('\n') 
+    
     
     fh.write('--------------------------------------------\n') 
-    fh.write('5.重要指标对比\n')
+    fh.write('--------------------------------------------\n') 
+    fh.write('重要指标对比\n')
     CompareItem(fh, '估值比：', data, 25, 0)
     CompareItem(fh, '市盈率：', data, 26, 0)
     CompareItem(fh, '市净率：', data, 27, 0)
-    CompareItem(fh, 'ROE：', data, 28, 0)
+    CompareItem(fh, 'ROE：', data, 28)
     CompareItem(fh, '毛利率：', data, 30)
     CompareItem(fh, '营收增长率：', data, 31)
     CompareItem(fh, '除非净利润增长率：', data, 32)
@@ -399,23 +386,166 @@ def ComprehensiveResult(fh):
     fh.write('**综合结论与评级报告**\n')
     fh.write('--------------------------------------------\n')
     
-## API接口函数    
-def Analyse(self_data, total_data):
-    '''
-    API函数
-    直接根据配置信息，从云端获取数据，填充字段，输出原始csv文件，txt分析文件，绘图
-    '''
-    s = time.strftime("_%Y%m%d")
-    s1 = time.strftime("%Y-%m-%d")
-    file_name = 'output/' + '诊断报告_' + company[0] + s + '.txt'
-    with open(file_name, 'w') as fh:
-        fh.write('版本号：V1.0\n')
-        fh.write('诊断时间：'+ s1 +'\n')
-        fh.write('诊断个股：'+ '隆基股份-' + '601012' + '\n')
-        SelfAnalyse(fh, self_data)
-        CompareAnalyse(fh, total_data)
-        ComprehensiveResult(fh)
 
+def data_normalize(data):
+    '''
+    辅助函数：输出数据归一化
+    行业对比前必须把数据归一化处理，否则没法同行业比较
+    '''
+    head = data.columns #获取表头
+    total_assets = data['总资产']
+    total_sale = data['营业收入']
+    result = pd.DataFrame(total_assets)
+    
+    tag = head[1]#净资产
+    opt = data[tag]
+    print(opt)
+    result[tag] = opt
+    
+    tag = head[2]#资产负债比
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[3]#流动资产
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[4]#一年内到期的长期负债
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[5]#应收款
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[6]#预收款
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[7]#存货
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[8]#营业收入
+    opt = data[tag]
+    opt = round(opt / total_assets, 3)
+    result[tag] = opt
+    
+    tag = head[9]#营业成本
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[10]#营业税金及附加
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[11]#财务费用
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[12]#营业外收入
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[13]#净利润
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[14]#除非净利润
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[15]#营业税金及附加
+    result[tag] = opt
+    
+    tag = head[16]#经营净额
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[17]#投资净额
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[18]#筹资净额
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+        
+    tag = head[19]#汇率影响
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[20]#现金净增加额
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[21]#期末现金净额
+    opt = data[tag]
+    opt = round(opt / total_sale, 3)
+    result[tag] = opt
+    
+    tag = head[22]#流动比率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[23]#资产周转率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[24]#存货周转率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[25]#溢价比
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[26]#市盈率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[27]#市净率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[28]#名义净资产收益率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[29]#实际净资产收益率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[30]#毛利率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[31]#营收增长率
+    opt = data[tag]
+    result[tag] = opt
+    
+    tag = head[32]#除非净利润增长率
+    opt = data[tag]
+    result[tag] = opt
+    
+#    print(result)
+#    result.to_csv('test.csv', encoding = 'gbk')
+    return result
 ###############################################################################
 if __name__ =='__main__':
     # 1. 初始化配置
@@ -423,9 +553,11 @@ if __name__ =='__main__':
     GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
     a = Compare2Themself('601012')
     a.to_csv('./output/compare_self.csv', encoding = 'gbk')
-    b = Compare2Industry(company)
-    b.to_csv('./output/compare_industry.csv', encoding = 'gbk')
+    b1= Compare2Industry(company)
+    b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
+    b = data_normalize(b1)
     Analyse(a,b)
+    #b要做标准化处理
     
     
-    PlotAnalyse(a)
+#    PlotAnalyse(a)
