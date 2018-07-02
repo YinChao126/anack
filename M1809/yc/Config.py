@@ -5,6 +5,7 @@ Created on Thu Jun 14 01:47:40 2018
 @author: yinchao
 """
 
+from datetime import datetime
 import crawling_finance_table
 import pymysql
 import os
@@ -32,7 +33,7 @@ def M1809_config():
     '''
     以读文件的方式获取配置参数
     1. 读取待考察的参数
-    2. 读取公司名称列表，并转换成id
+    2. 读取公司名称列表，并转换成id（如果输入无法解析成id，会自动剔除）
     3. 更新该公司的财务报表，以备以后使用
     注意：文件名不可改
     '''
@@ -70,29 +71,39 @@ def M1809_config():
             id = result[0][0] 
             id_list.append(id)
             
-        except:
+        except: #错误的ID号不会被解析（刚上市的，不会出现在anack_classify里，需要更新）
             print(name+' is not in list')
             pass   
     try:
         os.mkdir('.//output')
     except:
         pass 
+#    print(id_list)
+    M1809_Update(cur, id_list)
     return cur, parameter, id_list
 
-def M1809_Update():
+
+def M1809_Update(cur, id_list):
     '''
     更新数据库
     '''
-    print('start to update finnance data,please wait...')
+    print('check for update,please wait...')
     for item in id_list:
-            #此段增加判断逻辑，如果数据库已经是最新的，则不必更新了
-            
-            #
-            print(id)
-            cbfx = crawling_finance_table.crawling_finance('',id,'')
-            cbfx.crawling_update()
-    print('update finished!') 
+            cmd = "select * from Profit where h29 = \'" + item + "\' and h30 = \'" + str(datetime.now().year - 1)+"-12-31\';"
+            cur.execute(cmd)
+            result = cur.fetchall()
+            try:
+                trash_data = result[0] #获得资产负债表信息
+            except:
+                print('updating ', item)
+                cbfx = crawling_finance_table.crawling_finance('',item,'')
+                cbfx.crawling_update()
+    print('update check finished!') 
 
 #############################################################################
 if __name__ =='__main__':
-    cur, para,list_id = M1809_config()
+    cur, para,list_id = M1809_config()     
+    cmd = "select * from Profit where h29 = 600887;"            
+    cur.execute(cmd)
+    result = cur.fetchall()
+    print(len(result))
