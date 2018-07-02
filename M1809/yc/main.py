@@ -399,7 +399,7 @@ def data_normalize(data):
     
     tag = head[1]#净资产
     opt = data[tag]
-    print(opt)
+#    print(opt)
     result[tag] = opt
     
     tag = head[2]#资产负债比
