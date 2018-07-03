@@ -27,7 +27,7 @@ def Analyse(self_data, total_data):
     with open(file_name, 'w') as fh:
         fh.write('版本号：V1.0\n')
         fh.write('诊断时间：'+ s1 +'\n')
-        fh.write('诊断个股：'+ '隆基股份-' + '601012' + '\n')
+        fh.write('诊断个股：'+ company[0] + '\n')
         SelfAnalyse(fh, self_data)
         CompareAnalyse(fh, total_data)
         ComprehensiveResult(fh)
@@ -66,6 +66,7 @@ def Compare2Industry(company):
             result.append(a)
             index_id.append(individual)
         except:
+            print('drop ', individual,'\'s report')
             pass
     result = pd.DataFrame(result,index = index_id)
     result.loc['avarage'] = result.apply(lambda x: x.sum()/len(index_id))
@@ -284,9 +285,13 @@ def CompareItem(fh, comment, data, column, pole = 1):
     t = data.iloc[0][column]
     c = data.iloc[1][column]
     a = data.iloc[-1][column]
-    rate1 = round((t - c) / c,3)
-    rate2 = round((t - a) / a,3)
-    fh.write(str(rate1)+',\t'+str(rate2)+'\t')
+    if c == 0 or a == 0:
+        print('column = ', column,'一栏除数为0，特殊处理',t,c,a)
+        return score
+    else: 
+        rate1 = round((t - c) / c,3)
+        rate2 = round((t - a) / a,3)
+        fh.write(str(rate1)+',\t'+str(rate2)+'\t')
     
     cnt = 0
     if pole == 1:
@@ -551,11 +556,12 @@ if __name__ =='__main__':
     # 1. 初始化配置
     t_cur, parameter,company = Config.M1809_config() #获取配置信息 
     GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
-    a = Compare2Themself('601012')
+    a = Compare2Themself(company[0])
     a.to_csv('./output/compare_self.csv', encoding = 'gbk')
     b1= Compare2Industry(company)
     b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
     b = data_normalize(b1)
+    b.to_csv('test.csv',encoding='gbk')
     Analyse(a,b)
     #b要做标准化处理
     

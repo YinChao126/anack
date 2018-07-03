@@ -90,7 +90,7 @@ def GetSingleItem(para, stock_id, year):
     
     
     data1 = result #获得资产负债表信息
-    info[0] = float(data1[37].replace(',','')) #总资产
+    info[0] = float(data1[37].replace(',','')) #总资产,去掉逗号
     debt = float(data1[65].replace(',','')) #总负债
     info[2] = round((debt / info[0]),2)     #资产负债比
     info[1] = info[0] - debt #净资产
@@ -271,5 +271,5 @@ def SetCur(cloud_cur):
 if __name__ =='__main__':
     cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
     cur = cur_t
-    s = GetSingleItem(parameter,'601012',2017)
+    s = GetSingleItem(parameter,'600519',2017)
 #    print(s)
