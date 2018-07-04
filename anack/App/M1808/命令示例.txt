@@ -1,0 +1,21 @@
+AT:test         用于测试是否仍然在连接状态       成功
+AT:sleep=1      主机休息1分钟           成功
+logout/quit/exit用于退出整个程序        成功
+AT:set_target_id=600660,000651,601012   设置目标列表    成功
+AT:get_target_id?   查看目标列表      成功
+AT:clear_target     清空目标列表      成功
+AT:set_para=1.0,3.0 设置参数           成功
+AT:get_para?         查看已设置的参数     成功
+AT:check?             主动查询，         成功
+AT:level=1        设置level等级 0关闭   1只有价格预警   2价格+量比预警    3价格+量比+K线预警
+AT:run    运行一次，检查是否有异常状态      成功 
+
+
+
+使用说明：
+1. 系统启动后自动进入周期性查询状态（默认30秒查询一次，在M1808主函数中可修改）
+2. 通过set_target_id修改感兴趣的目标列表
+3. 通过set_para修改预警参数
+4. 通过level修改显示等级
+5. 如果需要禁止满屏信息，可直接发送sleep或者level=0
+6. 如果需要主动查询，可用check或者run
