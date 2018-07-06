@@ -43,6 +43,7 @@ def SelfAnalyse(fh, data):
     '''
  
     #1.资产分析
+    print('start self analyse')
     fh.write('\n--------------------------------------------\n')
     fh.write('**同比结果**\n')
     fh.write('--------------------------------------------\n')
@@ -123,6 +124,7 @@ def CompareAnalyse(fh, data):
     输入： fh->文件句柄，用于写txt文件
             data->同行业的数据（DataFrame)
     '''
+    print('start compare analyse')
     fh.write('\n--------------------------------------------\n')
     fh.write('**同行业对比结果与评级输出**\n')
     fh.write('--------------------------------------------\n')
@@ -130,21 +132,21 @@ def CompareAnalyse(fh, data):
     score = 0 #初始分数100分
     score += CompareItem(fh, '总资产对比：', data, 0)
     score += CompareItem(fh, '净资产对比：', data, 1)
-    score += CompareItem(fh, '资产负债比：', data, 2, 0)
-    score += CompareItem(fh, '应收款：', data, 5,0)
+    score += CompareItem(fh, '资产负债比：', data, 2, -1)
+    score += CompareItem(fh, '应收款：', data, 5,-1)
     score += CompareItem(fh, '预收款：', data, 6)
     score += CompareItem(fh, '存货：', data, 7)
     
     fh.write('--------------------------------------------\n') 
     fh.write('2.经营类对比\n')
     score += CompareItem(fh, '营收', data, 8)
-    score += CompareItem(fh, '营业外收入', data, 12, 0)
+    score += CompareItem(fh, '营业外收入', data, 12, -1) #没意义啊
     score += CompareItem(fh, '除非净利润：', data, 14)
     
     fh.write('--------------------------------------------\n') 
     fh.write('3.现金流对比\n')
     score += CompareItem(fh, '经营净额：', data, 16)
-    score += CompareItem(fh, '汇率影响：', data, 19, 0)
+    score += CompareItem(fh, '汇率影响：', data, 19, -1)
     score += CompareItem(fh, '现金净增加额：', data, 20)
     score += CompareItem(fh, '期末现金余额：', data, 21)
     
@@ -153,9 +155,11 @@ def CompareAnalyse(fh, data):
     score += CompareItem(fh, '流动比率：', data, 22)
     score += CompareItem(fh, '资产周转率：', data, 23)
     score += CompareItem(fh, '存货周转率：', data, 24)
-    #此处还要增加4个指标
     #自动评级结论在此处输出
-    score += 20
+    score += CompareItem(fh, 'ROE：', data, 28)
+    score += CompareItem(fh, '毛利率：', data, 30)
+    score += CompareItem(fh, '营收增长率：', data, 31)
+    score += CompareItem(fh, '除非净利润增长率：', data, 32)
     print(score)
     stra = '---->>|同行业对比得分：\t' + str(score) + '\t|<----\n'
     fh.write(stra) 
@@ -165,13 +169,9 @@ def CompareAnalyse(fh, data):
     fh.write('--------------------------------------------\n') 
     fh.write('--------------------------------------------\n') 
     fh.write('重要指标对比\n')
-    CompareItem(fh, '估值比：', data, 25, 0)
-    CompareItem(fh, '市盈率：', data, 26, 0)
-    CompareItem(fh, '市净率：', data, 27, 0)
-    CompareItem(fh, 'ROE：', data, 28)
-    CompareItem(fh, '毛利率：', data, 30)
-    CompareItem(fh, '营收增长率：', data, 31)
-    CompareItem(fh, '除非净利润增长率：', data, 32)
+    CompareItem(fh, '估值比：', data, 25, -1)
+    CompareItem(fh, '市盈率：', data, 26, -1)
+    CompareItem(fh, '市净率：', data, 27, -1)
 
     
 def ComprehensiveResult(fh):
@@ -193,6 +193,7 @@ def Compare2Themself(target_id, start_year = 2010):
     '''
     result = []
     index_id = []
+    print('get self report data...')
     for year in range(start_year, datetime.now().year):
         try:
             a = GetItemInfo.GetSingleItem(parameter,target_id,year)
@@ -211,6 +212,7 @@ def Compare2Industry(company):
     '''
     result = []
     index_id = []
+    print('get compare report data...')
     for individual in company:
         try:
             a = GetItemInfo.GetSingleItem(parameter,individual,datetime.now().year - 1)
@@ -337,16 +339,12 @@ def FileOutAverage(fh, comment, avg, last):
     fh.write(str(avg) + ',\t' + str(last) + '\n')
     
     
-
-
-
-
 ## 同行业对比
 
 def CompareItem(fh, comment, data, column, pole = 1):
     '''
     辅助函数：用于实现column字段的同行业对比，并直接输出到文档
-    pole: 1->高于对比值为良好）  其他任意值->低于对比值为良好
+    pole: 1 -> 高于对比值为良好）  -1 -> 低于对比值为良好
     '''
     score = 5 #初始单项分数为5分
     
@@ -363,36 +361,24 @@ def CompareItem(fh, comment, data, column, pole = 1):
         fh.write(str(rate1)+',\t'+str(rate2)+'\t')
     
     cnt = 0
-    if pole == 1:
-        if rate1 > 0.01:
-            fh.write(' ')
-            cnt = cnt + 1
-        else:
-            fh.write('劣于竞争对手，')
-            cnt = cnt - 1
-            score -= 2
-        if rate2 > 0.01:
-            fh.write(' ')
-            cnt = cnt + 1
-        else:
-            fh.write('劣于平均水平，')
-            cnt = cnt - 1
-            score -= 3
+    r1 = rate1 * pole
+    r2 = rate2 * pole
+    
+    if r1 < -0.01:
+        fh.write('劣于竞争对手，')
+        cnt = cnt - 1
+        score -= 2
     else:
-        if rate1 < 0.01:
-            fh.write(' ')
-            cnt = cnt + 1
-        else:
-            fh.write('劣于竞争对手，')
-            cnt = cnt - 1
-            score -= 2
-        if rate2 < 0.01:
-            fh.write(' ')
-            cnt = cnt + 1
-        else:
-            fh.write('劣于平均水平.')
-            cnt = cnt - 1
-            score -= 3
+        fh.write(' ')
+        cnt = cnt + 1
+    if r2 < -0.01:
+        fh.write('劣于平均水平,')
+        cnt = cnt - 1
+        score -= 3
+    else:
+        fh.write(' ')
+        cnt = cnt + 1
+        
     if cnt < 0:
         fh.write('该指标异常，请格外注意！\n')
     else:

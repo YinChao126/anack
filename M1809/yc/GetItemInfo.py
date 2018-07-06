@@ -215,7 +215,7 @@ def GetSingleItem(para, stock_id, year):
     
 
     DatStr = datetime(year,12,31)
-    cnt = 60 
+    cnt = 30 #考察连续30个交易日是否有数据
     while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
         day = DatStr.strftime('%Y%m%d')
         if trade_day.is_tradeday(day):
@@ -232,7 +232,7 @@ def GetSingleItem(para, stock_id, year):
 #    print (cur_price)
 #    print (date)
 
-    info[25] = round(cur_price * stock_num / info[0],2)
+    info[25] = round(cur_price * stock_num / info[1],2)
     info[26] = round(cur_price / info[15],2) #静态市盈率
     info[27] = round(info[1] / stock_num,2) #市净率
     
