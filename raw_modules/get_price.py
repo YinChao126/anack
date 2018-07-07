@@ -23,9 +23,9 @@ def get_close_price(id, day = 0):
     if day == 0:
         day = datetime.datetime.now() - datetime.timedelta(days=1)
         day = day.strftime("%Y%m%d")
-    if id[:3] == '002' or id[:3] == '300': #如果非主板，则前缀为1
+    if id[:3] == '000' or id[:3] == '002' or id[:3] == '300': #如果是深市，则前缀为1
         nid = '1' + id
-    else: #如果是主板，则前缀为0
+    else: #如果是沪市主板，则前缀为0
         nid = '0' + id
     url = "http://quotes.money.163.com/service/chddata.html?code=%s&start=%s&end=%s&\
     fields=TCLOSE" %(nid, day,day)

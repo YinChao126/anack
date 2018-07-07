@@ -90,7 +90,7 @@ def GetSingleItem(para, stock_id, year):
     
     
     data1 = result #获得资产负债表信息
-    info[0] = float(data1[37].replace(',','')) #总资产
+    info[0] = float(data1[37].replace(',','')) #总资产,去掉逗号
     debt = float(data1[65].replace(',','')) #总负债
     info[2] = round((debt / info[0]),2)     #资产负债比
     info[1] = info[0] - debt #净资产
@@ -215,7 +215,7 @@ def GetSingleItem(para, stock_id, year):
     
 
     DatStr = datetime(year,12,31)
-    cnt = 60 
+    cnt = 30 #考察连续30个交易日是否有数据
     while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
         day = DatStr.strftime('%Y%m%d')
         if trade_day.is_tradeday(day):
@@ -232,7 +232,7 @@ def GetSingleItem(para, stock_id, year):
 #    print (cur_price)
 #    print (date)
 
-    info[25] = round(cur_price * stock_num / info[0],2)
+    info[25] = round(cur_price * stock_num / info[1],2)
     info[26] = round(cur_price / info[15],2) #静态市盈率
     info[27] = round(info[1] / stock_num,2) #市净率
     
@@ -271,5 +271,5 @@ def SetCur(cloud_cur):
 if __name__ =='__main__':
     cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
     cur = cur_t
-    s = GetSingleItem(parameter,'601012',2017)
+    s = GetSingleItem(parameter,'600519',2017)
 #    print(s)
