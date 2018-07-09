@@ -11,7 +11,6 @@ import time
 import matplotlib.pyplot as plt
 #from pylab import *  
 #mpl.rcParams['font.sans-serif'] = ['SimHei'] 
-
 import GetItemInfo
 import Config
 
