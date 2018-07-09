@@ -32,18 +32,22 @@ for j in stock_code_num:
         print('error!')
         print(j)
     
-data = data.pivot_table('close',index='code',columns=['date'],aggfunc='mean',fill_value=0)  
+data_mean = data.pivot_table('close',index='code',columns=['date'],aggfunc='mean',fill_value=0)  
+data_var = data.pivot_table('close',index='code',columns=['date'],aggfunc='std',fill_value=0)  
 
 
-df_final = pd.DataFrame({'code' : data.index,
-                   'yiliu' : data['2016'],
-                   'yiqi' : data['2017'],
-                   'yiba' : data['2018']
+df_final = pd.DataFrame({'code' : data_mean.index,
+                   'yiliu_mean' : data_mean['2016'],
+                   'yiqi_mean' : data_mean['2017'],
+                   'yiba_mean' : data_mean['2018'],
+                   'yiliu_var' : data_var['2016'],
+                   'yiqi_var' : data_var['2017'],
+                   'yiba_var' : data_var['2018']
                    })
     
-df_final = df_final[df_final.yiliu != 0]
-df_final['firstincrase'] = (df_final['yiqi'] - df_final['yiliu'])/df_final['yiliu']
-df_final['secondincrase'] = (df_final['yiba'] - df_final['yiqi'])/df_final['yiba']
+df_final = df_final[df_final.yiliu_mean != 0]
+df_final['firstincrase'] = (df_final['yiqi_mean'] - df_final['yiliu_mean'])/df_final['yiliu_mean']
+df_final['secondincrase'] = (df_final['yiba_mean'] - df_final['yiqi_mean'])/df_final['yiba_mean']
 
-df_final[(df_final.firstincrase > 0.1) & (df_final.secondincrase > 0.1)]
+df_final[(df_final.firstincrase > 0.1) & (df_final.secondincrase > 0.1)& (df_final.yiliu_var < 15)& (df_final.yiqi_var < 15)& (df_final.yiba_var < 15)]
 df_final.to_csv('D:/999github/anack/M1809/target.csv',index =False)

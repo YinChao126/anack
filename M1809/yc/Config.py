@@ -4,6 +4,8 @@ Created on Thu Jun 14 01:47:40 2018
 
 @author: yinchao
 """
+import sys
+sys.path.append('../..')
 
 from datetime import datetime
 import crawling_finance_table
