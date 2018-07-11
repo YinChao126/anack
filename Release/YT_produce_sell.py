@@ -30,7 +30,7 @@ default_path = '../ExampleData/宇通客车产销数据/'
 class YTKC_Buy_Seller:
     '''
     利用产销快报绘制相关图形并保存图表，便于日常经营分析
-    '''
+    ''' 
     def __init__(self,year, month, work_path = default_path): 
         self.year = year
         self.month = month
