@@ -89,16 +89,16 @@ def get_period_price(id, start_day, stop_day = 0):
     return df
 
 if __name__ == '__main__':
-    id = '300124'
+    id = '601012'
     start_day = '20170625'
     stop_day = '20180625'
     
     #获取昨天的收盘价
-    price = get_close_price(id) 
-    print(price)
+#    price = get_close_price(id) 
+#    print(price)
     
 #    #获取指定一天的收盘价
-#    price = get_close_price('600660','20171009') 
+#    price = get_close_price('600660','20170209') 
 #    print(price)
 #    
 #    #获取从start_day开始直到昨天的收盘价
