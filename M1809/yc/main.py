@@ -86,7 +86,11 @@ def SelfAnalyse(fh, data):
     rate = GetRate(data,12,8) #现金与净资产的占比关系
     fh.write('现金/净资产:\t'+str(rate*100)+'%\n')
 #    print(rate, '\n')
-    
+    avg, last = GetAverage(data,33) #股息率
+    FileOutAverage(fh, '股息率', avg, last)
+    avg, last = GetAverage(data,34) #分红率
+    FileOutAverage(fh, '分红率', avg, last)
+   
     #3.现金流分析
     fh.write('--------------------------------------------\n') 
 #    print('现金流分析')
@@ -141,6 +145,8 @@ def CompareAnalyse(fh, data):
     score += CompareItem(fh, '营收', data, 8)
     score += CompareItem(fh, '营业外收入', data, 12, -1) #没意义啊
     score += CompareItem(fh, '除非净利润：', data, 14)
+    score += CompareItem(fh, '股息率', data, 33) 
+    score += CompareItem(fh, '分红率', data, 34)
     
     fh.write('--------------------------------------------\n') 
     fh.write('3.现金流对比\n')
@@ -335,7 +341,7 @@ def FileOutGrowth(fh, comment, avg, last, level):
         fh.write('去年加速衰退\n')
 def FileOutAverage(fh, comment, avg, last):
     fh.write(comment + ':\t')
-    fh.write(str(avg) + ',\t' + str(last) + '\n')
+    fh.write('avg '+str(avg) + ',\t' + 'self '+str(last) + '\n')
     
     
 ## 同行业对比
@@ -346,7 +352,6 @@ def CompareItem(fh, comment, data, column, pole = 1):
     pole: 1 -> 高于对比值为良好）  -1 -> 低于对比值为良好
     '''
     score = 5 #初始单项分数为5分
-    
     fh.write(comment)
     t = data.iloc[0][column]
     c = data.iloc[1][column]
@@ -542,6 +547,14 @@ def data_normalize(data):
     tag = head[32]#除非净利润增长率
     opt = data[tag]
     result[tag] = opt
+
+    tag = head[33]#股息率
+    opt = data[tag]
+    result[tag] = opt
+
+    tag = head[34]#分红率
+    opt = data[tag]
+    result[tag] = opt
     return result
 ###############################################################################
 if __name__ =='__main__':
@@ -556,6 +569,5 @@ if __name__ =='__main__':
     b.to_csv('test.csv',encoding='gbk')
     Analyse(a,b)
     #b要做标准化处理
-    
-    
+       
 #    PlotAnalyse(a)
