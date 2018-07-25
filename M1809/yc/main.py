@@ -205,6 +205,7 @@ def Compare2Themself(target_id, start_year = 2010):
             result.append(a)
             index_id.append(year)
         except:
+            print('pass ', str(year))
             pass
     result = pd.DataFrame(result,index = index_id)
     return result
@@ -341,7 +342,7 @@ def FileOutGrowth(fh, comment, avg, last, level):
         fh.write('去年加速衰退\n')
 def FileOutAverage(fh, comment, avg, last):
     fh.write(comment + ':\t')
-    fh.write('avg '+str(avg) + ',\t' + 'self '+str(last) + '\n')
+    fh.write(str(avg) + ',\t' + str(last) + '\n')
     
     
 ## 同行业对比
