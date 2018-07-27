@@ -10,6 +10,7 @@ Created on Thu Jun 14 01:44:29 2018
 import sys
 sys.path.append('../..')
 import raw_modules.get_price as gpc
+import Release.get_dividends_history as gdh
 
 
 from datetime import datetime, timedelta
@@ -92,7 +93,9 @@ def GetSingleItem(para, stock_id, year):
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
     cur.execute(cmd)
     result = cur.fetchall()
+#    print(result)
     result = list(result[0])
+#    print(result)
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(result)):
         if result[i] == '--':
@@ -279,6 +282,10 @@ def GetSingleItem(para, stock_id, year):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
+    px,Date=gdh.get_px_single_year(stock_id,year)
+    djr_price=gpc.get_close_price(stock_id,Date)
+    info[33] = round(float(px) / 10 / float(djr_price),3)
+    info[34] = round(float(px) / 10 / info[15],3)
     #print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
@@ -290,5 +297,7 @@ def SetCur(cloud_cur):
 if __name__ =='__main__':
     cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
     cur = cur_t
-    s = GetSingleItem(parameter,'600519',2017)
-#    print(s)
+    s = GetSingleItem(parameter,'600660',2015)
+    print(s)
+#    px,Date=gdh.get_px_single_year('601012',2014)
+#    print(px,Date)
