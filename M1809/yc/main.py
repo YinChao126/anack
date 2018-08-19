@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import GetItemInfo
 import Config
 import txttoexcel
+import PlotAnalyse
 
 ## API接口函数
 def Analyse(self_data, total_data):
@@ -238,11 +239,16 @@ def Compare2Industry(company):
     return result
 
 # 4. 绘图分析
-
+'''
 def PlotAnalyse(data):
-    '''
-    个股纵向对比绘图逻辑
-    '''
+
+    # 个股纵向对比绘图逻辑
+
+    # 显示中文标签
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    # 正常显示正负号
+    plt.rcParams['axes.unicode_minus'] = False
+
     Pictrue1 = data.iloc[:,[0,1,3]]
     Pictrue1.plot()
     plt.xlabel('年份')  #横坐标标签
@@ -279,7 +285,7 @@ def PlotAnalyse(data):
     plt.ylabel('') #纵坐标标签
     plt.title('重要参数对比')
     plt.show()
-
+'''
 def GetGrowth(data, column):
     '''
     辅助函数：程式化获取年复合增长率和去年的增长率
@@ -405,8 +411,13 @@ def data_normalize(data):
     行业对比前必须把数据归一化处理，否则没法同行业比较
     '''
     head = data.columns #获取表头
-    total_assets = data['总资产']
-    total_sale = data['营业收入']
+    tag = head[0]
+    #total_assets = data['总资产']
+    total_assets = data[tag]
+
+    tag = head[8]
+    #total_sale = data['营业收入']
+    total_sale = data[tag]
     result = pd.DataFrame(total_assets) #形成一个新的DataFrame，之后再添加列
 
     tag = head[1]#净资产
@@ -565,15 +576,15 @@ def data_normalize(data):
 ###############################################################################
 if __name__ =='__main__':
     # 1. 初始化配置
-    t_cur, parameter,company = Config.M1809_config() #获取配置信息
+    t_cur, parameter, company = Config.M1809_config() #获取配置信息
     GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
     a = Compare2Themself(company[0])
-    a.to_csv('./output/compare_self.csv', encoding = 'gbk')
+    a.to_csv('./output/compare_self.csv', encoding= 'gbk')
     b1= Compare2Industry(company)
     b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
     b = data_normalize(b1)
-    b.to_csv('test.csv',encoding='gbk')
+    b.to_csv('test.csv', encoding = 'gbk')
     Analyse(a,b)
-    #b要做标准化处理
-
-#    PlotAnalyse(a)
+    # b要做标准化处理
+    PlotAnalyse.PlotAnalyse(a)
+    #PlotAnalyse(a)
