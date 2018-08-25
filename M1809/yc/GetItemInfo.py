@@ -10,6 +10,7 @@ Created on Thu Jun 14 01:44:29 2018
 import sys
 sys.path.append('../..')
 import raw_modules.get_price as gpc
+import Release.get_dividends_history as gdh
 
 
 from datetime import datetime, timedelta
@@ -92,7 +93,9 @@ def GetSingleItem(para, stock_id, year):
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
     cur.execute(cmd)
     result = cur.fetchall()
+#    print(result)
     result = list(result[0])
+#    print(result)
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(result)):
         if result[i] == '--':
@@ -279,6 +282,24 @@ def GetSingleItem(para, stock_id, year):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
+    px,Date=gdh.get_px_single_year(stock_id,year-1)
+    if px == 0.0 or Date == '--':
+        info[33] = 0
+    else:       
+        DatStr = datetime.strptime(Date, '%Y%m%d')
+        cnt = 30 #考察连续30个交易日是否有数据
+        while cnt > 0: #获取年尾的数据，排除节假日，停牌的情况.无法排除未上市的情况
+            day = DatStr.strftime('%Y%m%d')
+    #        print(day)
+            if trade_day.is_tradeday(day):
+                cnt -= 1  
+                cur_price = float(gpc.get_close_price(str(stock_id),day))
+                if cur_price > 0.1:
+                    info[33] = round(float(px) / 10 / float(cur_price),3)
+                    break
+            DatStr -= timedelta(1)
+#    info[33] = round(float(px) / 10 / float(cur_price),3)
+    info[34] = round(float(px) / 10 / info[15],3)
     #print(pd.Series(info,index = para))
     return pd.Series(info,index = para)
 
@@ -290,5 +311,7 @@ def SetCur(cloud_cur):
 if __name__ =='__main__':
     cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
     cur = cur_t
-    s = GetSingleItem(parameter,'600519',2017)
+    s = GetSingleItem(parameter,'000957',2017)
 #    print(s)
+#    px,Date=gdh.get_px_single_year('601012',2014)
+#    print(px,Date)
