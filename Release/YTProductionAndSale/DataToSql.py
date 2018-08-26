@@ -48,15 +48,35 @@ from lxml import etree
 import os
 import datetime
 
-
+def Connect_sql(account):
+    conn = pymysql.connect(
+            host = account[0].strip(),
+            port = 3306,
+            user = account[1].strip(),
+            passwd = account[2].strip(),
+            db = account[3].strip(),
+            charset = "utf8"
+            )
+    
+    cur = conn.cursor()
+    print("\nconnect to aliyun success!\n")
+    return cur
 
 class ProductionSaleToSql:
-    def __init__(self,user,password,database,stock_code,StockName,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6,DownloadAdr="d:\\downloadTest"):
-        self.user = user                      #用户名 
-        self.password = password              #密码
-        self.database = database              #数据库
-        self.stock_code = stock_code          #股票代码
-        self.StockName = StockName            #股票名称
+    def __init__(self,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6,DownloadAdr="d:\\downloadTest"):
+        try:
+            with open('./config/account.txt', 'r') as fh:
+                account = fh.readlines()
+        except:
+            print('fail to initialize.')
+            return
+       
+        self.host = account[0].strip()       
+        self.user = account[1].strip()                      #用户名 
+        self.password = account[2].strip()              #密码
+        self.database = account[3].strip()              #数据库
+        self.stock_code = "600066"          #股票代码
+        self.StockName = "宇通客车"           #股票名称
         self.DownloadAdr = DownloadAdr        #下载路径
         self.YearBegin = YearBegin            #起始日期
         self.MonthBegin = MonthBegin          #结束日期
@@ -128,7 +148,7 @@ class ProductionSaleToSql:
     `cumulativeS_changeS_small` VARCHAR(100),            #累计数量同比变动（小型销售量）
     primary key (`stock_code`,`year`,`month`)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;'''
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(cmd)
         db.commit()
@@ -139,7 +159,7 @@ class ProductionSaleToSql:
     def InsertPSTable(self):
         sql = '''INSERT INTO `ProductionSale` (`stock_code`,`stock_name`,`year`,`month`)
                  VALUES (600360,'宇通客车',2018,3)'''
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         db.commit()
@@ -151,7 +171,7 @@ class ProductionSaleToSql:
         
         sql = "SELECT * FROM `ProductionSale` WHERE `stock_code`="+self.stock_code+" AND `year`="+years+" AND `month`="+months
                  
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         rs=cursor.fetchall()
@@ -170,7 +190,7 @@ class ProductionSaleToSql:
        
         sql = "SELECT "+fieldName+" FROM `ProductionSale` WHERE `stock_code`="+self.stock_code+" AND `year`="+years+" AND `month`="+months
                  
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         rs=cursor.fetchall()
@@ -272,7 +292,7 @@ class ProductionSaleToSql:
                 DataTuple=tuple(list(lls))
                 DataStr = str(tuple(DataTuple))
                 sql = "INSERT INTO `ProductionSale`"+" "+self.AllField+" "+"VALUES"+" "+DataStr
-                db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+                db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
                 cursor = db.cursor()
                 cursor.execute(sql)
                 db.commit()
@@ -302,18 +322,12 @@ class ProductionSaleToSql:
             
      
 if __name__ == "__main__":
-    user = "root"
-    password = "jip6669635"
-    database = "db_test1"
-    stock_code = "600066"
-    StockName = "宇通客车"
     ExeAdr=r"E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe"
     DownloadAdr = "d:\\downloadTest"
-    Update = ProductionSaleToSql(user=user,password=password,database=database,stock_code=stock_code,ExeAdr=ExeAdr,StockName=StockName,DownloadAdr=DownloadAdr,YearBegin = 2016,MonthBegin = 9)
-   # Update.ParametersSet(user=user,password=password,database=database,stock_code=stock_code,StockName=StockName,DownloadAdr=DownloadAdr,ExeAdr=ExeAdr,YearBegin = 2015,MonthBegin = 9)
+#    Update = ProductionSaleToSql(ExeAdr=ExeAdr,DownloadAdr=DownloadAdr,YearBegin = 2016,MonthBegin = 9)
+    Update = ProductionSaleToSql(ExeAdr=ExeAdr,DownloadAdr=DownloadAdr,YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
-#    data=Update.QueryPSData("2017","1","production")
-#    print (data)
+
     
 """
 self.user = user                      #用户名 
