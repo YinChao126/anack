@@ -47,10 +47,14 @@ import subprocess
 from lxml import etree
 import os
 import datetime
+import sys
+parent_path = os.path.dirname(sys.argv[0])
+print (parent_path)
+
 
 
 class ProductionSaleToSql:
-    def __init__(self,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6):
+    def __init__(self,YearBegin = 2017,MonthBegin = 6):
         try:
             with open('./config/account.txt', 'r') as fh:
                 account = fh.readlines()
@@ -65,14 +69,18 @@ class ProductionSaleToSql:
         self.stock_code = "600066"          #股票代码
         self.StockName = "宇通客车"           #股票名称
         
-        self.DownloadAdr = './PdfDownload'        #下载路径
+        #初始化文件下载区
+        self.DownloadAdr =  parent_path+r"/PdfDownload"    #下载路径
         isExists=os.path.exists(self.DownloadAdr)
         if not isExists:
             os.makedirs(self.DownloadAdr)
+    
+            
         
         self.YearBegin = YearBegin            #起始日期
         self.MonthBegin = MonthBegin          #结束日期
-        self.ExeAdr=ExeAdr
+        self.ExeAdr=os.path.join(parent_path,"pdf2htmlEX.exe")
+
         # 所有的字段列表   
         self.AllField ='''(`stock_code`,`stock_name`,`year`,`month`,`production`,`SPLY_production`,`moth_changeP`,`cumulativeP`,`SPLY_cumulativeP`,`cumulativeP_changeP`,`large_production`,`SPLY_production_large`,\
         `month_changeP_large`,`cumulativeP_large`,`SPLY_cumulativeP_large`,`cumulativeP_changeP_large`,`mid_production`,`SPLY_production_mid`,`month_changeP_mid`,`cumulativeP_mid`,\
@@ -207,8 +215,13 @@ class ProductionSaleToSql:
         return s.returncode
     
     def PDF2Html(self,PDFList):
+        os.makedirs(self.DownloadAdr+'/HTML')
         print ("Transform PDF to Html...")
-        cmd2 =r' --dest-dir D:\downloadTest\HTML D:/downloadTest/'
+        print (os.getcwd())#获得当前工作目录
+        HtmlAdd = os.path.join(parent_path,'PdfDownload/HTML').replace('/',"\\")
+        PdfAdd = os.path.join(parent_path,'PdfDownload').replace('/',"\\")
+        cmd2 =r' --dest-dir '
+        cmd2 = cmd2 + HtmlAdd+' '+PdfAdd
         HtmlList=[]
         for PDFFile in PDFList:
             DatePDF=PDFFile.split('_')[-2]
@@ -220,6 +233,7 @@ class ProductionSaleToSql:
             if (self.QueryPSTable(str(date.year),str(date.month))==-1):
                 HtmlName= PDFFile.split('.')[0]+'.html'
                 CMD=self.ExeAdr+cmd2+PDFFile+' '+HtmlName
+                print (CMD)
                 print ("transform "+PDFFile)
                 self.CMDRun(CMD)
                 HtmlList.append(HtmlName)
@@ -300,7 +314,7 @@ class ProductionSaleToSql:
       
     def ProSaleUpdate(self):
         self.CreatePSTable()
-        downLoad = PdfDown.PdfDownLoad(self.YearBegin,self.MonthBegin)
+        downLoad = PdfDown.PdfDownLoad(self.YearBegin,self.MonthBegin,self.DownloadAdr)
         downLoad.GetAllPdfFile()
         #print (downLoad.pdfList)
         HtmlList=self.PDF2Html(downLoad.pdfList)
@@ -314,9 +328,12 @@ class ProductionSaleToSql:
             
      
 if __name__ == "__main__":
-    ExeAdr=r"E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe"
-#    Update = ProductionSaleToSql(ExeAdr=ExeAdr,DownloadAdr=DownloadAdr,YearBegin = 2016,MonthBegin = 9)
-    Update = ProductionSaleToSql(ExeAdr=ExeAdr,YearBegin = 2018,MonthBegin = 7)
+    import sys
+    print (sys.argv[0])#获得的是当前执行脚本的位置（若在命令行执行的该命令，则为空）
+    parent_path = os.path.dirname(sys.argv[0])
+    print (parent_path)
+    print("1:",os.path.join(parent_path,'1'))
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
 
     

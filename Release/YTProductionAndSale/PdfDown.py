@@ -112,9 +112,10 @@ class PdfDownLoad:
                if os.path.isfile(path_file):
                    os.remove(path_file)
                if os.path.isdir(path_file):
-                   shutil.rmtree(path_file)    
+                   shutil.rmtree(path_file)
             if os.listdir(self.downloadAdrr):   #如果文件夹没有清理干净，抛出异常
                 raise FolderNotCleanException
+        
  
     def GetAllPdfFile(self):
         self.FolderClean()
