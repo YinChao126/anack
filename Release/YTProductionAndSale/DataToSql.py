@@ -48,22 +48,9 @@ from lxml import etree
 import os
 import datetime
 
-def Connect_sql(account):
-    conn = pymysql.connect(
-            host = account[0].strip(),
-            port = 3306,
-            user = account[1].strip(),
-            passwd = account[2].strip(),
-            db = account[3].strip(),
-            charset = "utf8"
-            )
-    
-    cur = conn.cursor()
-    print("\nconnect to aliyun success!\n")
-    return cur
 
 class ProductionSaleToSql:
-    def __init__(self,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6,DownloadAdr="d:\\downloadTest"):
+    def __init__(self,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6):
         try:
             with open('./config/account.txt', 'r') as fh:
                 account = fh.readlines()
@@ -77,7 +64,12 @@ class ProductionSaleToSql:
         self.database = account[3].strip()              #数据库
         self.stock_code = "600066"          #股票代码
         self.StockName = "宇通客车"           #股票名称
-        self.DownloadAdr = DownloadAdr        #下载路径
+        
+        self.DownloadAdr = './PdfDownload'        #下载路径
+        isExists=os.path.exists(self.DownloadAdr)
+        if not isExists:
+            os.makedirs(self.DownloadAdr)
+        
         self.YearBegin = YearBegin            #起始日期
         self.MonthBegin = MonthBegin          #结束日期
         self.ExeAdr=ExeAdr
@@ -323,9 +315,8 @@ class ProductionSaleToSql:
      
 if __name__ == "__main__":
     ExeAdr=r"E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe"
-    DownloadAdr = "d:\\downloadTest"
 #    Update = ProductionSaleToSql(ExeAdr=ExeAdr,DownloadAdr=DownloadAdr,YearBegin = 2016,MonthBegin = 9)
-    Update = ProductionSaleToSql(ExeAdr=ExeAdr,DownloadAdr=DownloadAdr,YearBegin = 2018,MonthBegin = 7)
+    Update = ProductionSaleToSql(ExeAdr=ExeAdr,YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
 
     
