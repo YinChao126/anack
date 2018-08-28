@@ -48,8 +48,15 @@ from lxml import etree
 import os
 import datetime
 import sys
+
 parent_path = os.path.dirname(sys.argv[0])
-print (parent_path)
+#print (parent_path)
+list = parent_path.split('/')
+WindowsPath = ''
+for part in  list:
+    WindowsPath = WindowsPath+part+'\\'
+#print (WindowsPath)
+    
 
 
 
@@ -70,7 +77,7 @@ class ProductionSaleToSql:
         self.StockName = "宇通客车"           #股票名称
         
         #初始化文件下载区
-        self.DownloadAdr =  parent_path+r"/PdfDownload"    #下载路径
+        self.DownloadAdr =  parent_path+r"/PdfDownload/"    #下载路径
         isExists=os.path.exists(self.DownloadAdr)
         if not isExists:
             os.makedirs(self.DownloadAdr)
@@ -79,7 +86,8 @@ class ProductionSaleToSql:
         
         self.YearBegin = YearBegin            #起始日期
         self.MonthBegin = MonthBegin          #结束日期
-        self.ExeAdr=os.path.join(parent_path,"pdf2htmlEX.exe")
+        self.ExeAdr=WindowsPath+'\\ExeFile\\'+"pdf2htmlEX.exe"
+    
 
         # 所有的字段列表   
         self.AllField ='''(`stock_code`,`stock_name`,`year`,`month`,`production`,`SPLY_production`,`moth_changeP`,`cumulativeP`,`SPLY_cumulativeP`,`cumulativeP_changeP`,`large_production`,`SPLY_production_large`,\
@@ -217,9 +225,8 @@ class ProductionSaleToSql:
     def PDF2Html(self,PDFList):
         os.makedirs(self.DownloadAdr+'/HTML')
         print ("Transform PDF to Html...")
-        print (os.getcwd())#获得当前工作目录
-        HtmlAdd = os.path.join(parent_path,'PdfDownload/HTML').replace('/',"\\")
-        PdfAdd = os.path.join(parent_path,'PdfDownload').replace('/',"\\")
+        HtmlAdd = WindowsPath + 'PdfDownload\HTML'
+        PdfAdd = WindowsPath+'PdfDownload\\'
         cmd2 =r' --dest-dir '
         cmd2 = cmd2 + HtmlAdd+' '+PdfAdd
         HtmlList=[]
@@ -333,7 +340,7 @@ if __name__ == "__main__":
     parent_path = os.path.dirname(sys.argv[0])
     print (parent_path)
     print("1:",os.path.join(parent_path,'1'))
-    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 6)
     Update.ProSaleUpdate()
 
     
