@@ -295,7 +295,7 @@ class ProductionSaleToSql:
                         #print(content)
                         lls.append(content[0])
                 #print (lls)
-                DataTuple=tuple(list(lls))
+                DataTuple=tuple(lls)
                 DataStr = str(tuple(DataTuple))
                 sql = "INSERT INTO `ProductionSale`"+" "+self.AllField+" "+"VALUES"+" "+DataStr
                 db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
@@ -329,7 +329,7 @@ class ProductionSaleToSql:
      
 if __name__ == "__main__":
 
-    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 5)
     Update.ProSaleUpdate()
 
     
