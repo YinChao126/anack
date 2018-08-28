@@ -6,8 +6,10 @@
 环境搭建步骤：
 1、下载pdf2htmlex
    下载地址：http://soft.rubypdf.com/software/pdf2htmlex-windows-version，下载后缀为win32-static的版本
-2、解压pdf2htmlex到.\Anack\anack\Release\YTProductionAndSale\ExeFile下，保证exe文件在ExeFile文件下，而不要在ExeFile下建文件夹保存
+2、解压pdf2htmlex到\anack\Release\YTProductionAndSale\ExeFile下，保证exe文件在ExeFile文件下，而不要在ExeFile下建文件夹保存
 运行脚本步骤
+1、在anack\Release\YTProductionAndSale\config下新建account.txt文件，用于登录远程数据库（与M1809的文件一致）
+2、调用DataToSql.py
 Update = ProductionSaleToSql(YearBegin = 2016,MonthBegin = 5)  #新建实例，参数代表对2016年5月以上的数据进行入库处理
 Update.ProSaleUpdate()                        #调用入库方法
 
