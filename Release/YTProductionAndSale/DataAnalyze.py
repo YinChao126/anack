@@ -25,7 +25,7 @@ class DataAnalyze:
         
     def run(self):
 
-        dataBase=DataToSql.ProductionSaleToSql(user=user,password=password,database=database,stock_code=stock_code,StockName=StockName,DownloadAdr=DownloadAdr,YearBegin = 2015,MonthBegin = 9)
+        dataBase=DataToSql.ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
         # data handle
         CurSale = [] #今年销量明细
         CurTotalSale = [] #今年销量累计
@@ -175,11 +175,6 @@ class DataAnalyze:
 # 使用前确保数据库中有相应数据
 
 if __name__ == "__main__":
-    user = "root"
-    password = "jip6669635"
-    database = "db_test1"
-    stock_code = "600066"
-    StockName = "宇通客车"
-    DA=DataAnalyze(2017,12)
+    DA=DataAnalyze(2017,2)
     DA.run()
        

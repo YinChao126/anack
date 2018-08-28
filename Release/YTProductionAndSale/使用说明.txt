@@ -2,10 +2,16 @@
 1、宇通客车采销数据入库
 2、宇通客车采销数据分析
 
-一、采销数据入库实现步骤（环境待见和用例解释见DataToSql.py）
-1、从新浪财经网站下载采销数据.pdf
-2、利用pdf2htmlex将pdf转换为html文档（方便数据提取）
-3、从html中提取数据，存储到数据库
+一、采销数据入库
+环境搭建步骤：
+1、下载pdf2htmlex
+   下载地址：http://soft.rubypdf.com/software/pdf2htmlex-windows-version，下载后缀为win32-static的版本
+2、解压pdf2htmlex到.\Anack\anack\Release\YTProductionAndSale\ExeFile下，保证exe文件在ExeFile文件下，而不要在ExeFile下建文件夹保存
+运行脚本步骤
+Update = ProductionSaleToSql(YearBegin = 2016,MonthBegin = 5)  #新建实例，参数代表对2016年5月以上的数据进行入库处理
+Update.ProSaleUpdate()                        #调用入库方法
 
 二、采销数据分析
-1、采销数据模块主要继承与超哥开发的DataAnalyze.py,唯一一点改动是数据来源于数据库而不是离线excel文件
+运行脚本步骤：
+DA=DataAnalyze(2017,2)  #初始化实例，参数代表对2017.1-2017.2的数据进行分析
+DA.run()
