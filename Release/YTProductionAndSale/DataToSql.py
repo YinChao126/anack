@@ -50,15 +50,10 @@ import datetime
 import sys
 
 parent_path = os.path.dirname(sys.argv[0])
-#print (parent_path)
 list = parent_path.split('/')
 WindowsPath = ''
 for part in  list:
     WindowsPath = WindowsPath+part+'\\'
-#print (WindowsPath)
-    
-
-
 
 class ProductionSaleToSql:
     def __init__(self,YearBegin = 2017,MonthBegin = 6):
@@ -240,7 +235,6 @@ class ProductionSaleToSql:
             if (self.QueryPSTable(str(date.year),str(date.month))==-1):
                 HtmlName= PDFFile.split('.')[0]+'.html'
                 CMD=self.ExeAdr+cmd2+PDFFile+' '+HtmlName
-                print (CMD)
                 print ("transform "+PDFFile)
                 self.CMDRun(CMD)
                 HtmlList.append(HtmlName)
@@ -254,9 +248,8 @@ class ProductionSaleToSql:
           
     def HtmlScrap(self,HtmlList):
         for Htmlname in HtmlList:
-            HtmlFolder = os.path.join(self.DownloadAdr,'HTML')
-            HtmlPath=os.path.join(HtmlFolder,Htmlname)
-            
+            HtmlPath=self.DownloadAdr+'HTML/'+Htmlname
+            print ('HtmlPath',HtmlPath)
             YMD=Htmlname.split('_')[-2]
         
             month=YMD[4:6]
@@ -335,12 +328,8 @@ class ProductionSaleToSql:
             
      
 if __name__ == "__main__":
-    import sys
-    print (sys.argv[0])#获得的是当前执行脚本的位置（若在命令行执行的该命令，则为空）
-    parent_path = os.path.dirname(sys.argv[0])
-    print (parent_path)
-    print("1:",os.path.join(parent_path,'1'))
-    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 6)
+
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
 
     
