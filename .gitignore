@@ -9,3 +9,4 @@ output/
 *.cfg
 config/
 PdfDownload/
+ExeFile/

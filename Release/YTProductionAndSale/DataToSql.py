@@ -329,7 +329,7 @@ class ProductionSaleToSql:
      
 if __name__ == "__main__":
 
-    Update = ProductionSaleToSql(YearBegin = 2016,MonthBegin = 5)
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
 
     
