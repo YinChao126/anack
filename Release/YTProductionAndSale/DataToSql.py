@@ -47,20 +47,43 @@ import subprocess
 from lxml import etree
 import os
 import datetime
+import sys
 
-
+parent_path = os.path.dirname(sys.argv[0])
+list = parent_path.split('/')
+WindowsPath = ''
+for part in  list:
+    WindowsPath = WindowsPath+part+'\\'
 
 class ProductionSaleToSql:
-    def __init__(self,user,password,database,stock_code,StockName,ExeAdr=r'E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe',YearBegin = 2017,MonthBegin = 6,DownloadAdr="d:\\downloadTest"):
-        self.user = user                      #用户名 
-        self.password = password              #密码
-        self.database = database              #数据库
-        self.stock_code = stock_code          #股票代码
-        self.StockName = StockName            #股票名称
-        self.DownloadAdr = DownloadAdr        #下载路径
+    def __init__(self,YearBegin = 2017,MonthBegin = 6):
+        try:
+            with open('./config/account.txt', 'r') as fh:
+                account = fh.readlines()
+        except:
+            print('fail to initialize.')
+            return
+       
+        self.host = account[0].strip()       
+        self.user = account[1].strip()                      #用户名 
+        self.password = account[2].strip()              #密码
+        self.database = account[3].strip()              #数据库
+        self.stock_code = "600066"          #股票代码
+        self.StockName = "宇通客车"           #股票名称
+        
+        #初始化文件下载区
+        self.DownloadAdr =  parent_path+r"/PdfDownload/"    #下载路径
+        isExists=os.path.exists(self.DownloadAdr)
+        if not isExists:
+            os.makedirs(self.DownloadAdr)
+    
+            
+        
         self.YearBegin = YearBegin            #起始日期
         self.MonthBegin = MonthBegin          #结束日期
-        self.ExeAdr=ExeAdr
+        self.ExeAdr=WindowsPath+'\\ExeFile\\'+"pdf2htmlEX.exe"
+    
+
         # 所有的字段列表   
         self.AllField ='''(`stock_code`,`stock_name`,`year`,`month`,`production`,`SPLY_production`,`moth_changeP`,`cumulativeP`,`SPLY_cumulativeP`,`cumulativeP_changeP`,`large_production`,`SPLY_production_large`,\
         `month_changeP_large`,`cumulativeP_large`,`SPLY_cumulativeP_large`,`cumulativeP_changeP_large`,`mid_production`,`SPLY_production_mid`,`month_changeP_mid`,`cumulativeP_mid`,\
@@ -128,7 +151,7 @@ class ProductionSaleToSql:
     `cumulativeS_changeS_small` VARCHAR(100),            #累计数量同比变动（小型销售量）
     primary key (`stock_code`,`year`,`month`)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;'''
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(cmd)
         db.commit()
@@ -139,7 +162,7 @@ class ProductionSaleToSql:
     def InsertPSTable(self):
         sql = '''INSERT INTO `ProductionSale` (`stock_code`,`stock_name`,`year`,`month`)
                  VALUES (600360,'宇通客车',2018,3)'''
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         db.commit()
@@ -151,7 +174,7 @@ class ProductionSaleToSql:
         
         sql = "SELECT * FROM `ProductionSale` WHERE `stock_code`="+self.stock_code+" AND `year`="+years+" AND `month`="+months
                  
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         rs=cursor.fetchall()
@@ -170,7 +193,7 @@ class ProductionSaleToSql:
        
         sql = "SELECT "+fieldName+" FROM `ProductionSale` WHERE `stock_code`="+self.stock_code+" AND `year`="+years+" AND `month`="+months
                  
-        db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+        db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
         cursor = db.cursor()
         cursor.execute(sql)
         rs=cursor.fetchall()
@@ -195,8 +218,12 @@ class ProductionSaleToSql:
         return s.returncode
     
     def PDF2Html(self,PDFList):
+        os.makedirs(self.DownloadAdr+'/HTML')
         print ("Transform PDF to Html...")
-        cmd2 =r' --dest-dir D:\downloadTest\HTML D:/downloadTest/'
+        HtmlAdd = WindowsPath + 'PdfDownload\HTML'
+        PdfAdd = WindowsPath+'PdfDownload\\'
+        cmd2 =r' --dest-dir '
+        cmd2 = cmd2 + HtmlAdd+' '+PdfAdd
         HtmlList=[]
         for PDFFile in PDFList:
             DatePDF=PDFFile.split('_')[-2]
@@ -221,9 +248,8 @@ class ProductionSaleToSql:
           
     def HtmlScrap(self,HtmlList):
         for Htmlname in HtmlList:
-            HtmlFolder = os.path.join(self.DownloadAdr,'HTML')
-            HtmlPath=os.path.join(HtmlFolder,Htmlname)
-            
+            HtmlPath=self.DownloadAdr+'HTML/'+Htmlname
+            print ('HtmlPath',HtmlPath)
             YMD=Htmlname.split('_')[-2]
         
             month=YMD[4:6]
@@ -269,10 +295,10 @@ class ProductionSaleToSql:
                         #print(content)
                         lls.append(content[0])
                 #print (lls)
-                DataTuple=tuple(list(lls))
+                DataTuple=tuple(lls)
                 DataStr = str(tuple(DataTuple))
                 sql = "INSERT INTO `ProductionSale`"+" "+self.AllField+" "+"VALUES"+" "+DataStr
-                db = pymysql.connect(user=self.user,password=self.password,database=self.database,charset="utf8")
+                db = pymysql.connect(host=self.host,user=self.user,password=self.password,database=self.database,charset="utf8")
                 cursor = db.cursor()
                 cursor.execute(sql)
                 db.commit()
@@ -288,7 +314,7 @@ class ProductionSaleToSql:
       
     def ProSaleUpdate(self):
         self.CreatePSTable()
-        downLoad = PdfDown.PdfDownLoad(self.YearBegin,self.MonthBegin)
+        downLoad = PdfDown.PdfDownLoad(self.YearBegin,self.MonthBegin,self.DownloadAdr)
         downLoad.GetAllPdfFile()
         #print (downLoad.pdfList)
         HtmlList=self.PDF2Html(downLoad.pdfList)
@@ -302,18 +328,10 @@ class ProductionSaleToSql:
             
      
 if __name__ == "__main__":
-    user = "root"
-    password = "jip6669635"
-    database = "db_test1"
-    stock_code = "600066"
-    StockName = "宇通客车"
-    ExeAdr=r"E:\JianLPeng\Software\pdfToHtml\pdf2htmlEX.exe"
-    DownloadAdr = "d:\\downloadTest"
-    Update = ProductionSaleToSql(user=user,password=password,database=database,stock_code=stock_code,ExeAdr=ExeAdr,StockName=StockName,DownloadAdr=DownloadAdr,YearBegin = 2016,MonthBegin = 9)
-   # Update.ParametersSet(user=user,password=password,database=database,stock_code=stock_code,StockName=StockName,DownloadAdr=DownloadAdr,ExeAdr=ExeAdr,YearBegin = 2015,MonthBegin = 9)
+
+    Update = ProductionSaleToSql(YearBegin = 2018,MonthBegin = 7)
     Update.ProSaleUpdate()
-#    data=Update.QueryPSData("2017","1","production")
-#    print (data)
+
     
 """
 self.user = user                      #用户名 

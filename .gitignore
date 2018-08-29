@@ -8,3 +8,5 @@ output/
 *.csv
 *.cfg
 config/
+PdfDownload/
+ExeFile/
