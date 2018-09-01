@@ -207,7 +207,8 @@ def Compare2Themself(target_id, start_year = 2010):
     print('get self report data...')
     for year in range(start_year, datetime.now().year):
         try:
-            a = GetItemInfo.GetSingleItem(parameter,target_id,year)
+#            a = GetItemInfo.GetSingleItem(parameter,target_id,year)
+            a = GetItemInfo.GetSingleLocalItem(parameter,target_id,year)
             result.append(a)
             index_id.append(year)
         except:
@@ -227,7 +228,8 @@ def Compare2Industry(company):
     print('get compare report data...')
     for individual in company:
         try:
-            a = GetItemInfo.GetSingleItem(parameter,individual,datetime.now().year - 1)
+#            a = GetItemInfo.GetSingleItem(parameter,individual,datetime.now().year - 1)
+            a = GetItemInfo.GetSingleLocalItem(parameter,individual,datetime.now().year - 1)
             result.append(a)
             index_id.append(individual)
         except:
@@ -576,8 +578,14 @@ def data_normalize(data):
 ###############################################################################
 if __name__ =='__main__':
     # 1. 初始化配置
-    t_cur, parameter, company = Config.M1809_config() #获取配置信息
-    GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
+    # 网络方式
+#    t_cur, parameter, company = Config.M1809_config() #获取配置信息
+#    GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
+    # 本地方式
+    id_list = ['000651', '000333', '600690']
+    parameter, company = Config.M1809_local_config(id_list)
+    
+    
     a = Compare2Themself(company[0])
     a.to_csv('./output/compare_self.csv', encoding= 'gbk')
     b1= Compare2Industry(company)
