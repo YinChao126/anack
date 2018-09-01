@@ -24,11 +24,11 @@ def Analyse(self_data, total_data):
     '''
     s = time.strftime("_%Y%m%d")
     s1 = time.strftime("%Y-%m-%d")
-    file_name = 'output/' + '诊断报告_' + company[0] + s + '.txt'#形成文件名
+    file_name = '../output/' + '诊断报告_' + Config.company_id_list[0] + s + '.txt'#形成文件名
     with open(file_name, 'w') as fh:
         fh.write('版本号：V1.0\n')
         fh.write('诊断时间：'+ s1 +'\n')
-        fh.write('诊断个股：'+ company[0] + '\n')
+        fh.write('诊断个股：'+ Config.company_id_list[0] + '\n')
         SelfAnalyse(fh, self_data) #同比分析并写文件
         CompareAnalyse(fh, total_data) #同行业对比分析并写文件
         ComprehensiveResult(fh) #手动分析部分（不用关心）
@@ -207,8 +207,14 @@ def Compare2Themself(target_id, start_year = 2010):
     print('get self report data...')
     for year in range(start_year, datetime.now().year):
         try:
-#            a = GetItemInfo.GetSingleItem(parameter,target_id,year)
-            a = GetItemInfo.GetSingleLocalItem(parameter,target_id,year)
+            if Config.data_src == 'SQL':
+                a = GetItemInfo.GetSingleItem(target_id,year)
+            elif Config.data_src == 'CSV':
+                a = GetItemInfo.GetSingleLocalItem(target_id,year)
+            else:
+                print('compare failure. bad parameter')
+                return
+            
             result.append(a)
             index_id.append(year)
         except:
@@ -228,8 +234,14 @@ def Compare2Industry(company):
     print('get compare report data...')
     for individual in company:
         try:
-#            a = GetItemInfo.GetSingleItem(parameter,individual,datetime.now().year - 1)
-            a = GetItemInfo.GetSingleLocalItem(parameter,individual,datetime.now().year - 1)
+            if Config.data_src == 'SQL':
+                a = GetItemInfo.GetSingleItem(individual,datetime.now().year - 1)
+            elif Config.data_src == 'CSV':
+                a = GetItemInfo.GetSingleLocalItem(individual,datetime.now().year - 1)
+            else:
+                print('compare failure. bad parameter')
+                return
+            
             result.append(a)
             index_id.append(individual)
         except:
@@ -240,54 +252,6 @@ def Compare2Industry(company):
 #    result.to_csv('compare_industry.csv')
     return result
 
-# 4. 绘图分析
-'''
-def PlotAnalyse(data):
-
-    # 个股纵向对比绘图逻辑
-
-    # 显示中文标签
-    plt.rcParams['font.sans-serif'] = ['SimHei']
-    # 正常显示正负号
-    plt.rcParams['axes.unicode_minus'] = False
-
-    Pictrue1 = data.iloc[:,[0,1,3]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('元') #纵坐标标签
-    plt.title('体量')
-
-    Pictrue1 = data.iloc[:,[2]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('') #纵坐标标签
-    plt.title('安全性检查')
-
-    Pictrue1 = data.iloc[:,[22,23,24]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('') #纵坐标标签
-    plt.title('营运情况')
-
-    Pictrue1 = data.iloc[:,[16,19,20]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('') #纵坐标标签
-    plt.title('现金情况')
-
-    Pictrue1 = data.iloc[:,[12,9,11]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('') #纵坐标标签
-    plt.title('盈利质量')
-
-    Pictrue1 = data.iloc[:,[22,23,24]]
-    Pictrue1.plot()
-    plt.xlabel('年份')  #横坐标标签
-    plt.ylabel('') #纵坐标标签
-    plt.title('重要参数对比')
-    plt.show()
-'''
 def GetGrowth(data, column):
     '''
     辅助函数：程式化获取年复合增长率和去年的增长率
@@ -578,21 +542,17 @@ def data_normalize(data):
 ###############################################################################
 if __name__ =='__main__':
     # 1. 初始化配置
-    # 网络方式
-#    t_cur, parameter, company = Config.M1809_config() #获取配置信息
-#    GetItemInfo.SetCur(t_cur) #配置cur，否则无法联上数据库
-    # 本地方式
     id_list = ['000651', '000333', '600690']
-    parameter, company = Config.M1809_local_config(id_list)
+    Config.M1809_config(id_list,'CSV')
     
+    # 2. 获取数据
+    a = Compare2Themself(Config.company_id_list[0])    #自身对比
+    a.to_csv('../output/compare_self.csv', encoding= 'gbk') 
+    b1= Compare2Industry(Config.company_id_list)    #同行业对比
+    b1.to_csv('../output/compare_industry.csv', encoding = 'gbk')
+    b = data_normalize(b1)  #归一化的同行业对比
+    b.to_csv('../output/normalize.csv', encoding = 'gbk') 
     
-    a = Compare2Themself(company[0])
-    a.to_csv('./output/compare_self.csv', encoding= 'gbk')
-    b1= Compare2Industry(company)
-    b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
-    b = data_normalize(b1)
-    b.to_csv('test.csv', encoding = 'gbk')
+    # 3. 分析并保存图片
     Analyse(a,b)
-    # b要做标准化处理
     PlotAnalyse.PlotAnalyse(a)
-    #PlotAnalyse(a)

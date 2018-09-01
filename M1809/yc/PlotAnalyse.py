@@ -6,7 +6,7 @@ Created on Tue July 24 08:26:21 2018
 """
 
 import numpy as np
-import main
+import CoreAnalyse
 from matplotlib import pyplot as plt
 
 
@@ -53,10 +53,10 @@ def PlotAnalyse(data):
     plt.rcParams['axes.unicode_minus'] = False
 
     # 资产水平分析
-    avg, last, level = main.GetGrowth(data, 0)  # 总资产_复合增长率
-    avg_, last_, level_ = main.GetGrowth(data, 1)  # 净资产_复合增长率
-    rate = main.GetRate(data, 3, 0)  # 流动资产_总资产占比
-    debt_avg, debt_last = main.GetAverage(data, 2)  # 资产负债比_平均水平
+    avg, last, level = CoreAnalyse.GetGrowth(data, 0)  # 总资产_复合增长率
+    avg_, last_, level_ = CoreAnalyse.GetGrowth(data, 1)  # 净资产_复合增长率
+    rate = CoreAnalyse.GetRate(data, 3, 0)  # 流动资产_总资产占比
+    debt_avg, debt_last = CoreAnalyse.GetAverage(data, 2)  # 资产负债比_平均水平
 
     x1 = data.iloc[:, [0]].index.tolist()
     x2 = np.arange(4)
@@ -82,13 +82,13 @@ def PlotAnalyse(data):
                    , title='资产水平分析')
 
     # 经营质量分析
-    avg1, last1, _ = main.GetGrowth(data, 8)  # 营业收入_复合增长率
-    avg2, last2 = main.GetAverage(data, 30)  # 毛利率
-    avg3, last3, _ = main.GetGrowth(data, 14)  # 除非净利润
-    avg4, last4, _ = main.GetGrowth(data, 10)  # 营业税
-    rate = main.GetRate(data, 12, 8)  # 现金与净资产的占比关系
-    avg5, last5 = main.GetAverage(data, 33) #股息率
-    avg6, last6 = main.GetAverage(data, 34) #分红率
+    avg1, last1, _ = CoreAnalyse.GetGrowth(data, 8)  # 营业收入_复合增长率
+    avg2, last2 = CoreAnalyse.GetAverage(data, 30)  # 毛利率
+    avg3, last3, _ = CoreAnalyse.GetGrowth(data, 14)  # 除非净利润
+    avg4, last4, _ = CoreAnalyse.GetGrowth(data, 10)  # 营业税
+    rate = CoreAnalyse.GetRate(data, 12, 8)  # 现金与净资产的占比关系
+    avg5, last5 = CoreAnalyse.GetAverage(data, 33) #股息率
+    avg6, last6 = CoreAnalyse.GetAverage(data, 34) #分红率
 
     x1 = np.arange(3)
     x1_data_name = ['现金/净资产', '股息率', '分红率']
@@ -119,10 +119,10 @@ def PlotAnalyse(data):
                    , title='经营质量分析')
 
     # 现金流分析
-    avg1, last1, _ = main.GetGrowth(data, 16)  # 营业现金
-    avg2, last2, _ = main.GetGrowth(data, 20)  # 增加的现金
-    avg3, last3, _ = main.GetGrowth(data, 21)  # 期末现金
-    rate = main.GetRate(data, 21, 1)  # 现金与净资产的占比关系
+    avg1, last1, _ = CoreAnalyse.GetGrowth(data, 16)  # 营业现金
+    avg2, last2, _ = CoreAnalyse.GetGrowth(data, 20)  # 增加的现金
+    avg3, last3, _ = CoreAnalyse.GetGrowth(data, 21)  # 期末现金
+    rate = CoreAnalyse.GetRate(data, 21, 1)  # 现金与净资产的占比关系
 
     x1 = np.arange(4)
     x1_data_name = ['营业现金增长率', '现金增长净额', '期末现金', '现金与净资产的占比']
@@ -140,9 +140,9 @@ def PlotAnalyse(data):
                    , title='现金流分析')
 
     # 4.营运质量分析
-    avg1, last1 = main.GetAverage(data, 22)  # 流动比率
-    avg2, last2 = main.GetAverage(data, 23)  # 资产周转率
-    avg3, last3 = main.GetAverage(data, 24)  # 存货周转率
+    avg1, last1 = CoreAnalyse.GetAverage(data, 22)  # 流动比率
+    avg2, last2 = CoreAnalyse.GetAverage(data, 23)  # 资产周转率
+    avg3, last3 = CoreAnalyse.GetAverage(data, 24)  # 存货周转率
 
     x1 = np.arange(3)
     x1_data_name = ['流动比率', '资产周转率', '存货周转率']

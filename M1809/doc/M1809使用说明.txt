@@ -1,0 +1,32 @@
+
+可以通过数据库或者访问本地数据文件来获取基本面数据
+
+API说明：
+提供3个API供用户调用
+Init
+GetData
+Analyse
+
+
+详见UserApi.py
+
+
+
+使用示例：
+
+id_list = ['000651', '000333', '600690']  #此处可以任意修改
+
+data_src = 'SQL' #访问数据库
+data_src = 'CSV' #本地读文件（二选一，默认为此选项）
+
+Config.M1809_local_config(id_list, data_src) #实现环境配置，自动更新数据
+
+a = Compare2Themself(company[0])  #自身对比
+a.to_csv('./output/compare_self.csv', encoding= 'gbk')
+b1= Compare2Industry(company) #和其他企业对比
+b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
+b = data_normalize(b1)
+b.to_csv('test.csv', encoding = 'gbk')
+Analyse(a,b)  #统计输出到csv文件
+
+PlotAnalyse.PlotAnalyse(a) #结果绘图输出

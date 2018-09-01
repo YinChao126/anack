@@ -23,9 +23,6 @@ np.set_printoptions(suppress=True)
 import Config
 import trade_day
 
-
-global cur
-cur = 0
 '''
 list 对照表
 0   总资产
@@ -76,14 +73,11 @@ def DataTreat(AStr):
     return returnNum
         
 
-def GetSingleItem(para, stock_id, year):
+def GetSingleItem(stock_id, year):
     '''
     返回一个series，
     '''
-    
-    #
-    global cur
-    p_len = len(para) #自动计算参数列表长度
+    p_len = len(Config.parameter) #自动计算参数列表长度
     info = []   #实际待填充的字段，最后用于生成Series的value部分
   
     for s in range(p_len):
@@ -91,8 +85,8 @@ def GetSingleItem(para, stock_id, year):
             
     #资产负债表中查询与填充
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
+    Config.cur.execute(cmd)
+    result = Config.cur.fetchall()
 #    print(result)
     result = list(result[0])
 #    print(result)
@@ -116,8 +110,8 @@ def GetSingleItem(para, stock_id, year):
     
      #去年的资产负载表
     cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year-1)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
+    Config.cur.execute(cmd)
+    result = Config.cur.fetchall()
     data1_last = list(result[0]) #获得去年年末资产负债表信息
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(data1_last)):
@@ -128,8 +122,8 @@ def GetSingleItem(para, stock_id, year):
     
     #利润表查询与填充
     cmd = "select * from Profit where h29 = \'"+stock_id+"\' and h30 = \'"+str(year)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
+    Config.cur.execute(cmd)
+    result = Config.cur.fetchall()
     result = list(result[0])
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(result)):
@@ -155,8 +149,8 @@ def GetSingleItem(para, stock_id, year):
     stock_num = info[13]/ info[15] #股份数量
     #上一年度利润表
     cmd = "select * from Profit where h29 = \'"+stock_id+"\' and h30 = \'"+str(year-1)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
+    Config.cur.execute(cmd)
+    result = Config.cur.fetchall()
     data2_last = list(result[0]) #获得资产负债表信息
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(data2_last)):
@@ -174,8 +168,8 @@ def GetSingleItem(para, stock_id, year):
     
     #现金流量表查询与填充
     cmd = "select * from cashFlow where h72 = \'"+stock_id+"\' and h73 = \'"+str(year)+"-12-31\';"
-    cur.execute(cmd)
-    result = cur.fetchall()
+    Config.cur.execute(cmd)
+    result = Config.cur.fetchall()
     result = list(result[0])
     # 此处需要把 -- 的选项替换成 0
     for i in range(len(result)):
@@ -301,15 +295,9 @@ def GetSingleItem(para, stock_id, year):
 #    info[33] = round(float(px) / 10 / float(cur_price),3)
     info[34] = round(float(px) / 10 / info[15],3)
     #print(pd.Series(info,index = para))
-    return pd.Series(info,index = para)
+    return pd.Series(info,index = Config.parameter)
 
-
-def SetCur(cloud_cur):
-    global cur
-    cur = cloud_cur
-
-
-def GetSingleLocalItem(para, stock_id, year, quarter = 4):     
+def GetSingleLocalItem(stock_id, year, quarter = 4):     
     from datetime import datetime #获取时间
     if quarter == 1:
 #        time_str = datetime(year, 3,31)
@@ -325,9 +313,6 @@ def GetSingleLocalItem(para, stock_id, year, quarter = 4):
         time_str = str(year) + '-12-31'
     time_str_last_year = str(year-1) + '-12-31'
 
-# =============================================================================
-# 文件搜索
-# =============================================================================
     prefix = '../history_data/'
     suffix_balnce_sheet = '_balance_sheet.csv'
     suffix_cash_flow = '_cash_flow.csv'
@@ -354,7 +339,7 @@ def GetSingleLocalItem(para, stock_id, year, quarter = 4):
 
 #    print(Config.data_base_path)
 #    print(result)
-    p_len = len(para) #自动计算参数列表长度
+    p_len = len(Config.parameter) #自动计算参数列表长度
     info = []   #实际待填充的字段，最后用于生成Series的value部分
   
     for s in range(p_len):
@@ -560,16 +545,15 @@ def GetSingleLocalItem(para, stock_id, year, quarter = 4):
 #    info[33] = round(float(px) / 10 / float(cur_price),3)
     info[34] = round(float(px) / 10 / info[15],3)
     #print(pd.Series(info,index = para))
-    return pd.Series(info,index = para)
+    return pd.Series(info,index = Config.parameter)
     
 ###############################################################################
 if __name__ =='__main__':
     #网络测试
-#    cur_t, parameter,company_id = Config.M1809_config() #获取配置信息
-#    cur = cur_t
-#    s = GetSingleItem(parameter,'000333',2017)
+    id_list = ['000651', '000333', '600690'] #此处可以修改
+#    Config.M1809_config(id_list,'SQL') #获取配置信息
+#    s = GetSingleItem('000333',2017)
 
     #本地测试
-    id_list = ['000651', '000333', '600690'] #此处可以修改
-    parameter,company_id = Config.M1809_local_config(id_list)
-    s = GetSingleLocalItem(parameter,'000333',2017,4)
+    Config.M1809_config(id_list,'CSV')
+    s = GetSingleLocalItem('000333',2017,4)
