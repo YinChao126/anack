@@ -84,7 +84,7 @@ def GetSingleItem(stock_id, year):
         info.append(-1) #初始化为-1，代表还未填充
             
     #资产负债表中查询与填充
-    cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
+    cmd = "select * from zichanfuzhai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year)+"-12-31\';"
     Config.cur.execute(cmd)
     result = Config.cur.fetchall()
 #    print(result)
@@ -109,7 +109,7 @@ def GetSingleItem(stock_id, year):
     CurrentLiabilities = DataTreat(data1[54])  #流动负载
     
      #去年的资产负载表
-    cmd = "select * from zichanfuzai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year-1)+"-12-31\';"
+    cmd = "select * from zichanfuzhai where h79 = \'"+stock_id+"\' and h80 = \'"+str(year-1)+"-12-31\';"
     Config.cur.execute(cmd)
     result = Config.cur.fetchall()
     data1_last = list(result[0]) #获得去年年末资产负债表信息
@@ -556,4 +556,4 @@ if __name__ =='__main__':
 
     #本地测试
     Config.M1809_config(id_list,'CSV')
-    s = GetSingleLocalItem('000333',2017,4)
+    s2 = GetSingleLocalItem('000333',2017)

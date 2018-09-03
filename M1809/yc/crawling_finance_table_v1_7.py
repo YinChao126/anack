@@ -306,16 +306,16 @@ class crawling_finance:
             except:
                 pass       
             
-        zichanfuzai = pd.DataFrame()    
+        zichanfuzhai = pd.DataFrame()    
         for i in range(date[len(date)-1],date[0]+1):
             url = 'http://money.finance.sina.com.cn/corp/go.php/vFD_BalanceSheet/stockid/'+self.stock_code+'/ctrl/'+str(i)+'/displaytype/4.phtml'
             html = self.get_one_page(url)          
             df = self.parse_one_page_zichanfuzhai(html)
             df['stock_code'] = self.stock_code
 #            print(df)
-            zichanfuzai = pd.concat([zichanfuzai,df])            #两个dataframe做连接，类似数据库的union all
-#        print(zichanfuzai)
-        zichanfuzai.to_csv(self.work_path + '/'+self.stock_code +'_'+'balance_sheet.csv', encoding='gbk')
+            zichanfuzhai = pd.concat([zichanfuzhai,df])            #两个dataframe做连接，类似数据库的union all
+#        print(zichanfuzhai)
+        zichanfuzhai.to_csv(self.work_path + '/'+self.stock_code +'_'+'balance_sheet.csv', encoding='gbk')
         
         
         xianjinliuliang = pd.DataFrame()    

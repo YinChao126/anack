@@ -194,36 +194,48 @@ def M1809_Update(cur, id_list):
     更新数据库
     '''
     print('check for update,please wait...')
-    print(id_list)
+#    print(id_list)
     for item in id_list:
-#        cmd = "select * from zichanfuzai where h79 = \'" + item + "\' and h80 = \'" + str(datetime.now().year - 1)+"-12-31\';"
-#        cur.execute(cmd)
-#        result = cur.fetchall()
-#        cmd2 = "select * from cashFlow where h72 = \'" + item + "\' and h73 = \'" + str(datetime.now().year - 1)+"-12-31\';"
-#        cur.execute(cmd2)
-#        result2 = cur.fetchall()
-        cmd3 = "select * from Profit where h29 = \'" + item + "\' and h30 = \'" + str(datetime.now().year - 1)+"-12-31\';"
-        print(1)
-        cur.execute(cmd3)
-        print(2)
-        result3 = cur.fetchall()
         try:
-#            trash_data = result[0] #获得资产负债表信息
-#            trash_data = result2[0] #获得资产负债表信息
-            trash_data = result3[0] #获得资产负债表信息
-            print('here')
+            
+            cmd = "select * from zichanfuzhai where h79 = \'" + item + "\' and h80 = \'" + str(datetime.now().year - 1)+"-12-31\';"
+            cur.execute(cmd)
+            result1 = cur.fetchall()
         except:
             print('updating ', item)
             cbfx = crawling_finance_table.crawling_finance('',item,'')
             cbfx.crawling_update()
+            continue
+        
+        try:
+            cmd2 = "select * from cashFlow where h72 = \'" + item + "\' and h73 = \'" + str(datetime.now().year - 1)+"-12-31\';"
+            cur.execute(cmd2)
+            result2 = cur.fetchall()
+        except:
+            print('updating ', item)
+            cbfx = crawling_finance_table.crawling_finance('',item,'')
+            cbfx.crawling_update()
+            continue
+            
+        try:
+            cmd3 = "select * from Profit where h29 = \'" + item + "\' and h30 = \'" + str(datetime.now().year - 1)+"-12-31\';"
+            cur.execute(cmd3)
+            result3 = cur.fetchall()
+            trash_data = result3[0] #获得资产负债表信息
+        except:
+            print('updating ', item)
+            cbfx = crawling_finance_table.crawling_finance('',item,'')
+            cbfx.crawling_update()
+            continue
+        
     print('update check finished!') 
 
 #############################################################################
 if __name__ =='__main__':
     id_list = ['000651', '000333', '600690']
     #网络测试
-#    M1809_config(id_list, 'SQL')     
+    M1809_config(id_list, 'SQL')     
     
     #本地测试
-    M1809_config(id_list, 'CSV')
+#    M1809_config(id_list, 'CSV')
         

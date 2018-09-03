@@ -1,32 +1,30 @@
+本工程实现任意给定个股的基本面分析
 
-可以通过数据库或者访问本地数据文件来获取基本面数据
+其特征如下：
+1. 可以通过数据库或者访问本地数据文件来获取基本面数据
+2. 获取的数据可选存为本地文档
+3. 可以实现指定个股连续多年（默认是从2010年开始）的基本面对比分析
+4. 可以实现多个股（一般是同行业）的横向对比分析
+5. 能够自动生成评估报告并绘图表示出来
 
+--------------------------------------------------------------------------------------
 API说明：
 提供3个API供用户调用
-Init
-GetData
-Analyse
+1. Init(id_list, MODE) #初始化配置，主要是配置目标个股和数据来源 
+  id_ilst:个股ID列表    MODE:数据来源选择， 
+  MODE = "SQL" -> 数据来源于数据库 
+  MODE = "CSV" -> 数据来源于本地CSV文件
 
+2. GetData(switch) #自动获取数据 
+  switch：是否将获取的数据存储到本地？ 只能为"ON"或者"OFF"
 
-详见UserApi.py
+3. Analyse()    #分析数据并输出评估报告，并绘图显示 
 
-
-
+--------------------------------------------------------------------------------------
 使用示例：
-
-id_list = ['000651', '000333', '600690']  #此处可以任意修改
-
-data_src = 'SQL' #访问数据库
-data_src = 'CSV' #本地读文件（二选一，默认为此选项）
-
-Config.M1809_local_config(id_list, data_src) #实现环境配置，自动更新数据
-
-a = Compare2Themself(company[0])  #自身对比
-a.to_csv('./output/compare_self.csv', encoding= 'gbk')
-b1= Compare2Industry(company) #和其他企业对比
-b1.to_csv('./output/compare_industry.csv', encoding = 'gbk')
-b = data_normalize(b1)
-b.to_csv('test.csv', encoding = 'gbk')
-Analyse(a,b)  #统计输出到csv文件
-
-PlotAnalyse.PlotAnalyse(a) #结果绘图输出
+import UserApi
+id_list = ['000651', '000333', '600690']
+if __name__ =='__main__':
+    UserApi.Init(id_list,'SQL') #初始化配置：采用数据库访问的形式获取id_list的基本面数据
+    UserApi.GetData('OFF') #获取数据，并禁止保存到本地
+    UserApi.Analyse() #对数据进行分析，并绘图

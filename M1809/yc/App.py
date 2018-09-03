@@ -11,5 +11,5 @@ import UserApi
 id_list = ['000651', '000333', '600690']
 if __name__ =='__main__':
     UserApi.Init(id_list,'CSV')
-    a,b = UserApi.GetData('OFF')
-    UserApi.Analyse(a,b)
+    UserApi.GetData('OFF')
+    UserApi.Analyse()

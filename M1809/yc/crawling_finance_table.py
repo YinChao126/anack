@@ -339,7 +339,7 @@ class crawling_finance:
     def createTables(self):
         db = pymysql.connect(host = self.hosts,user = self.users, password = self.passwords, database = self.databases,charset='utf8')
         cursor = db.cursor()
-        sql1 = """CREATE TABLE IF NOT EXISTS `zichanfuzai`( 
+        sql1 = """CREATE TABLE IF NOT EXISTS `zichanfuzhai`( 
 `h1`    varchar(255) DEFAULT NULL,
 `h2`    varchar(255) DEFAULT NULL,
 `h3`    varchar(255) DEFAULT NULL,
@@ -562,7 +562,7 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8"""
         # create tables
 #        self.createTables()
         
-        zichanfuzai = pd.DataFrame()    
+        zichanfuzhai = pd.DataFrame()    
         for i in range(date[len(date)-1],date[0]+1):
             url = 'http://money.finance.sina.com.cn/corp/go.php/vFD_BalanceSheet/stockid/'+self.stock_code+'/ctrl/'+str(i)+'/displaytype/4.phtml'
             html = self.get_one_page(url)          
@@ -571,17 +571,17 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8"""
 # =============================================================================
 #             print(df)
 # =============================================================================
-            zichanfuzai = pd.concat([zichanfuzai,df])            #两个dataframe做连接，类似数据库的union all
+            zichanfuzhai = pd.concat([zichanfuzhai,df])            #两个dataframe做连接，类似数据库的union all
 # =============================================================================
-#         print(zichanfuzai)
+#         print(zichanfuzhai)
 # =============================================================================
-#        zichanfuzai.to_csv(self.work_path + '/'+self.stock_code +'_'+'balance_sheet.csv')
+#        zichanfuzhai.to_csv(self.work_path + '/'+self.stock_code +'_'+'balance_sheet.csv')
         
 # Test insert into mysql
-        zichanfuzai['Date'] = zichanfuzai.index
+        zichanfuzhai['Date'] = zichanfuzhai.index
         balanceColumns = ['h' + str(i) for i in range(1,81)]
-        zichanfuzai.columns = balanceColumns
-        self.df_to_mysql('zichanfuzai',zichanfuzai)
+        zichanfuzhai.columns = balanceColumns
+        self.df_to_mysql('zichanfuzhai',zichanfuzhai)
         
         xianjinliuliang = pd.DataFrame()    
         for i in range(date[len(date)-1],date[0]+1):            
