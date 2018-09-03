@@ -120,7 +120,7 @@ def M1809_config(company_list, mode = 'CSV'):
         注意：文件名不可改
         '''
         try:
-            with open('../sys_config/account.txt', 'r') as fh:
+            with open('../sys_config/account.cfg', 'r') as fh:
                 account = fh.readlines()
         except:
             print('fail to initialize.')

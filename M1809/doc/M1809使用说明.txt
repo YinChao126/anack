@@ -28,3 +28,18 @@ if __name__ =='__main__':
     UserApi.Init(id_list,'SQL') #初始化配置：采用数据库访问的形式获取id_list的基本面数据
     UserApi.GetData('OFF') #获取数据，并禁止保存到本地
     UserApi.Analyse() #对数据进行分析，并绘图
+    
+备注：
+如果选择使用SQL模式获取数据，请如下配置（CSV模式不用配置）
+1. 在/sys_config文件夹下兴建一个 “account.cfg”的文件
+2. 依次输入你的mysql账号的配置信息（每条配置独占一行）
+ip
+user_name
+password
+database
+
+比如：
+localhost
+usr1
+123456
+db1
