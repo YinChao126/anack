@@ -23,7 +23,7 @@ def Connect_sql(account):
             )
     
     cur = conn.cursor()
-    print(account)
+#    print(account)
     print("\nconnect to aliyun success!\n")
     return cur
 
@@ -87,6 +87,8 @@ def M1809_config(company_list, mode = 'CSV'):
     global parameter
     global company_id_list
     data_src = mode
+    company_id_list = company_list
+    
     print('please wait, check for updating...')
      
     try: #自动检查并创建文件夹
@@ -105,6 +107,8 @@ def M1809_config(company_list, mode = 'CSV'):
     if len(company_list) < 2:
         print('最少需要输入2个id作为对比')
         return
+    #此处增加id合法性检查
+    
     
     if data_src == 'SQL' or data_src == 'sql':
         '''
@@ -115,50 +119,27 @@ def M1809_config(company_list, mode = 'CSV'):
         3. 更新该公司的财务报表，以备以后使用
         注意：文件名不可改
         '''
-        del parameter[:]
-        with open ('./config/parameter_list.txt','r',encoding = 'utf-8') as fh:
-            ct = fh.readlines()
-        
-        
-        for s in ct:
-            items = s.strip()
-            if items != '': 
-                if items[0] == '#': #剔除注释部分
-                    break
-                parameter.append(items)
-        
-        with open('./config/company_list.txt','r', encoding = 'utf-8') as fh:
-            ct = fh.readlines()
-        company = []
-        for s in ct:
-            if s.strip() != '': 
-                company.append(s.strip())
         try:
-            with open('./config/account.txt', 'r') as fh:
+            with open('../sys_config/account.txt', 'r') as fh:
                 account = fh.readlines()
         except:
             print('fail to initialize.')
             return
    
         cur = Connect_sql(account)
-        id_list = []
-        for name in company:
-            cmd = "select * from anack_classify where name = \'"+name+"\';"
-            cur.execute(cmd)
-            result = cur.fetchall()
-            try:
-                id = result[0][0] 
-                id_list.append(id)
-                
-            except: #错误的ID号不会被解析（刚上市的，不会出现在anack_classify里，需要更新）
-                print(name+' is not in list')
-                pass   
-        try:
-            os.mkdir('.//output')
-        except:
-            pass 
-#        print(id_list)
-#        return parameter, company_list
+#        此处增加ID合法性检查
+#        id_list = []
+#        for name in company_id_list:
+#            cmd = "select * from anack_classify where name = \'"+name+"\';"
+#            cur.execute(cmd)
+#            result = cur.fetchall()
+#            try:
+#                id = result[0][0] 
+#                id_list.append(id)
+#                
+#            except: #错误的ID号不会被解析（刚上市的，不会出现在anack_classify里，需要更新）
+#                print(name+' is not in list')
+#                pass   
         M1809_Update(cur, company_list)
     
     elif data_src == 'CSV' or data_src == 'csv':  
@@ -186,8 +167,7 @@ def M1809_config(company_list, mode = 'CSV'):
     else:
         print('模式设置错误，请二选一：CSV/SQL') 
         
-    print('finished!')
-    company_id_list = company_list
+    print('finish init!')
     
 def M1809_Update(cur, id_list):
     '''
@@ -232,7 +212,7 @@ def M1809_Update(cur, id_list):
 
 #############################################################################
 if __name__ =='__main__':
-    id_list = ['000651', '000333', '600690']
+    id_list = ['000651', '000333', '600690', '600522']
     #网络测试
     M1809_config(id_list, 'SQL')     
     

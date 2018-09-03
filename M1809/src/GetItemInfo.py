@@ -551,9 +551,9 @@ def GetSingleLocalItem(stock_id, year, quarter = 4):
 if __name__ =='__main__':
     #网络测试
     id_list = ['000651', '000333', '600690'] #此处可以修改
-#    Config.M1809_config(id_list,'SQL') #获取配置信息
-#    s = GetSingleItem('000333',2017)
+    Config.M1809_config(id_list,'SQL') #获取配置信息
+    s = GetSingleItem('000333',2017)
 
     #本地测试
-    Config.M1809_config(id_list,'CSV')
-    s2 = GetSingleLocalItem('000333',2017)
+#    Config.M1809_config(id_list,'CSV')
+#    s2 = GetSingleLocalItem('000333',2017)
