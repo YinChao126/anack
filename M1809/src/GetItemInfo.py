@@ -9,8 +9,8 @@ Created on Thu Jun 14 01:44:29 2018
 # 远程数据库访问
 import sys
 sys.path.append('../..')
-import raw_modules.get_price as gpc
-import Release.get_dividends_history as gdh
+import get_price
+import get_dividends_history
 
 
 from datetime import datetime, timedelta
@@ -236,7 +236,7 @@ def GetSingleItem(stock_id, year):
         day = DatStr.strftime('%Y%m%d')
         if trade_day.is_tradeday(day):
             cnt -= 1  
-            cur_price= DataTreat(gpc.get_close_price(stock_id,day))
+            cur_price= DataTreat(get_price.get_close_price(stock_id,day))
             if cur_price > 0.1:
 #                print(day)
 #                print(cur_price)
@@ -276,7 +276,7 @@ def GetSingleItem(stock_id, year):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
-    px,Date=gdh.get_px_single_year(stock_id,year-1)
+    px,Date=get_dividends_history.get_px_single_year(stock_id,year-1)
     if px == 0.0 or Date == '--':
         info[33] = 0
     else:       
@@ -287,7 +287,7 @@ def GetSingleItem(stock_id, year):
     #        print(day)
             if trade_day.is_tradeday(day):
                 cnt -= 1  
-                cur_price = float(gpc.get_close_price(str(stock_id),day))
+                cur_price = float(get_price.get_close_price(str(stock_id),day))
                 if cur_price > 0.1:
                     info[33] = round(float(px) / 10 / float(cur_price),3)
                     break
@@ -486,7 +486,7 @@ def GetSingleLocalItem(stock_id, year, quarter = 4):
         day = DatStr.strftime('%Y%m%d')
         if trade_day.is_tradeday(day):
             cnt -= 1  
-            cur_price= DataTreat(gpc.get_close_price(stock_id,day))
+            cur_price= DataTreat(get_price.get_close_price(stock_id,day))
             if cur_price > 0.1:
 #                print(day)
 #                print(cur_price)
@@ -526,7 +526,7 @@ def GetSingleLocalItem(stock_id, year, quarter = 4):
 #    #除非净利润增长率 = (年末 - 年初)/ 年初 * 100%
     info[32] = round((info[14] - NullNetProfit) / NullNetProfit,2)
     
-    px,Date=gdh.get_px_single_year(stock_id,year-1)
+    px,Date=get_dividends_history.get_px_single_year(stock_id,year-1)
     if px == 0.0 or Date == '--':
         info[33] = 0
     else:       
@@ -537,7 +537,7 @@ def GetSingleLocalItem(stock_id, year, quarter = 4):
     #        print(day)
             if trade_day.is_tradeday(day):
                 cnt -= 1  
-                cur_price = float(gpc.get_close_price(str(stock_id),day))
+                cur_price = float(get_price.get_close_price(str(stock_id),day))
                 if cur_price > 0.1:
                     info[33] = round(float(px) / 10 / float(cur_price),3)
                     break
