@@ -65,6 +65,7 @@ def parse(html):
                 '登记日':register_day
                 }
         frame = pd.DataFrame(data)
+        d = pd.DataFrame(columns = frame.columns.values.tolist())
         for i in range(len(frame)): #删除无效的记录并重新排序，保证按时间顺序来
             if frame.iloc[len(frame) - 1 - i]['除权日'] != '--':
                 d = d.append(frame.iloc[len(frame) - 1 - i],ignore_index=True)
